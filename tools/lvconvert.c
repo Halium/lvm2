@@ -694,7 +694,7 @@ static void _remove_missing_empty_pv(struct volume_group *vg, struct dm_list *re
 
 	if (removed) {
 		if (!vg_write(vg) || !vg_commit(vg)) {
-			stack;
+			log_stack;
 			return;
 		}
 		log_warn("WARNING: %d missing and now unallocated Physical Volumes removed from VG.", removed);
@@ -2512,7 +2512,7 @@ deactivate_pmslv:
 
 	/* Try to allocate new pool metadata spare LV */
 	if (!handle_pool_metadata_spare(pool_lv->vg, 0, pvh, poolmetadataspare))
-		stack;
+		log_stack;
 
 	if (!detach_pool_metadata_lv(first_seg(pool_lv), &mlv))
 		return_0;
@@ -2672,7 +2672,7 @@ deactivate_pmslv:
 
 	/* Try to allocate new pool metadata spare LV */
 	if (!handle_pool_metadata_spare(cache_lv->vg, 0, pvh, poolmetadataspare))
-		stack;
+		log_stack;
 
 	if (!detach_pool_metadata_lv(first_seg(pool_lv), &mlv))
 		return_0;
@@ -2839,7 +2839,7 @@ static int _lvconvert_to_thin_with_external(struct cmd_context *cmd,
 	}
 
 	if (!lv_update_and_reload(thin_lv)) {
-		stack;
+		log_stack;
 		goto deactivate_and_revert_new_lv;
 	}
 
@@ -3829,7 +3829,7 @@ static int _lvconvert_repair_pvs_mirror(struct cmd_context *cmd, struct logical_
 	lp.stripes = 1;
 
 	if (!(ret = _lvconvert_mirrors_repair(cmd, lv, &lp, use_pvh)))
-		stack;
+		log_stack;
 
 	if (lp.need_polling) {
 		if (!lv_is_active(lv))
@@ -5786,7 +5786,7 @@ static int _lvconvert_detach_writecache(struct cmd_context *cmd,
 			log_error("See lvchange --cachesettings cleaner=1");
 
 			if (!active_begin && active_clean && !deactivate_lv(cmd, lv))
-				stack;
+				log_stack;
 			return 0;
 		}
 
@@ -5829,7 +5829,7 @@ static int _lvconvert_detach_writecache(struct cmd_context *cmd,
 	 * then deactivate before the detach.
 	 */
 	if (!active_begin && active_clean && !deactivate_lv(cmd, lv))
-		stack;
+		log_stack;
 
 	if (is_clean)
 		noflush = 1;
@@ -5924,7 +5924,7 @@ static int _lvconvert_detach_writecache_when_clean(struct cmd_context *cmd,
 		unlock_and_release_vg(cmd, vg, vg->name);
 
 		if (is_lockd && !lockd_vg(cmd, id->vg_name, "un", 0, &lockd_state))
-			stack;
+			log_stack;
 
 		log_print_unless_silent("Detaching writecache cleaning %llu blocks", (unsigned long long)dirty);
 		log_print_unless_silent("This command can be cancelled and rerun to complete writecache detach.");
@@ -5939,7 +5939,7 @@ static int _lvconvert_detach_writecache_when_clean(struct cmd_context *cmd,
 		 * a flush message.
 		 */
 		if (!deactivate_lv(cmd, lv))
-			stack;
+			log_stack;
 	}
 
 	log_print_unless_silent("Detaching writecache completed cleaning.");
@@ -5977,7 +5977,7 @@ out_release:
 
 out_lockd:
 	if (is_lockd && !lockd_vg(cmd, id->vg_name, "un", 0, &lockd_state))
-		stack;
+		log_stack;
 
 	return ret;
 }
@@ -6006,7 +6006,7 @@ static int _writecache_zero(struct cmd_context *cmd, struct logical_volume *lv)
 	}
 
 	if (!(ret = wipe_lv(lv, wp)))
-		stack;
+		log_stack;
 
 	if (!deactivate_lv(cmd, lv)) {
 		log_error("Failed to deactivate LV %s for zeroing.", display_lvname(lv));
@@ -6242,7 +6242,7 @@ static int _check_writecache_memory(struct cmd_context *cmd, struct logical_volu
 
 	if (dm_snprintf(proc_meminfo, sizeof(proc_meminfo),
 			"%s/meminfo", cmd->proc_dir) < 0) {
-		stack;
+		log_stack;
 		goto skip_proc;
 	}
 
@@ -6253,7 +6253,7 @@ static int _check_writecache_memory(struct cmd_context *cmd, struct logical_volu
 		if (strncmp(line, "MemTotal:", 9))
 			continue;
 		if (sscanf(line, "%*s%llu%*s", &proc_mem_kb) != 1) {
-			stack;
+			log_stack;
 			break;
 		}
 		break;
@@ -6375,20 +6375,20 @@ int lvconvert_writecache_attach_single(struct cmd_context *cmd,
 		if (!sync_local_dev_names(cmd)) {
 			log_error("Failed to sync local dev names.");
 			if (!deactivate_lv(cmd, lv))
-				stack;
+				log_stack;
 			goto bad;
 		}
 	}
 
 	if (!_set_writecache_block_size(cmd, lv, &block_size_sectors)) {
 		if (!is_active && !deactivate_lv(cmd, lv))
-			stack;
+			log_stack;
 		goto_bad;
 	}
 
 	if (!_check_writecache_memory(cmd, lv_fast, block_size_sectors)) {
 		if (!is_active && !deactivate_lv(cmd, lv))
-			stack;
+			log_stack;
 		goto_bad;
 	}
 

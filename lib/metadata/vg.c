@@ -118,7 +118,7 @@ int link_lv_to_vg(struct volume_group *vg, struct logical_volume *lv)
 	struct lv_list *lvl;
 
 	if (vg_max_lv_reached(vg))
-		stack;
+		log_stack;
 
 	lvl = &lv->lvl;
 	lvl->lv = lv;
@@ -143,7 +143,7 @@ int unlink_lv_from_vg(struct logical_volume *lv)
 	 * So just remove the name from active lv_names */
 	if (lv->vg->lv_names &&
 	    !radix_tree_remove(lv->vg->lv_names, lv->name, strlen(lv->name)))
-		stack;
+		log_stack;
 
 	return 1;
 }

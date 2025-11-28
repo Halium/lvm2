@@ -295,7 +295,7 @@ static int _add_alias(struct device *dev, const char *path, enum add_hash hash)
 
 	if (hash == REHASH)
 		if (!radix_tree_remove(_cache.names, path, path_len))
-			stack;
+			log_stack;
 
 	/* Is name already there? */
 	dm_list_iterate_items(strl, &dev->aliases)
@@ -698,7 +698,7 @@ void dev_cache_failed_path(struct device *dev, const char *path)
 	struct dm_str_list *strl;
 
 	if (!radix_tree_remove(_cache.names, path, strlen(path)))
-		stack;
+		log_stack;
 
 	dm_list_iterate_items(strl, &dev->aliases) {
 		if (!strcmp(strl->str, path)) {
@@ -1190,7 +1190,7 @@ static void _drop_all_aliases(struct device *dev)
 	dm_list_iterate_items_safe(strl, strl2, &dev->aliases) {
 		log_debug("Drop alias for %u:%u %s.", MAJOR(dev->dev), MINOR(dev->dev), strl->str);
 		if (!radix_tree_remove(_cache.names, strl->str, strlen(strl->str)))
-			stack;
+			log_stack;
 		dm_list_del(&strl->list);
 	}
 }
@@ -1490,7 +1490,7 @@ static bool _visit_check_for_open_devices(struct radix_tree_iterator *it,
 			  dev_name(dev), dev->open_count);
 		vt->num_open++;
 		if (vt->close_immediate && !dev_close_immediate(dev))
-			stack;
+			log_stack;
 	}
 
 	if (vt->free) {
@@ -1624,7 +1624,7 @@ void dev_cache_verify_aliases(struct device *dev)
 				  MAJOR(dev->dev), MINOR(dev->dev), strl->str,
 				  MAJOR(st.st_rdev), MINOR(st.st_rdev));
 			if (!radix_tree_remove(_cache.names, strl->str, strlen(strl->str)))
-				stack;
+				log_stack;
 			dm_list_del(&strl->list);
 		}
 	}
@@ -1659,7 +1659,7 @@ static struct device *_dev_cache_get(struct cmd_context *cmd, const char *name, 
 				  name, MAJOR(dev->dev), MINOR(dev->dev), dev_name(dev));
 
 			if (!radix_tree_remove(_cache.names, name, strlen(name)))
-				stack;
+				log_stack;
 
 			_remove_alias(dev, name);
 
@@ -2043,7 +2043,7 @@ static void devices_file_rename_unused(struct cmd_context *cmd)
 		return;
 
 	if (rename(path, path2) < 0) {
-		stack;
+		log_stack;
 		return;
 	}
 	log_debug("Devices file moved to %s", path2);
@@ -2416,7 +2416,7 @@ static char *_get_devname_from_devno(struct cmd_context *cmd, dev_t devno)
 				continue;
 			if (dm_snprintf(devname, sizeof(devname), "/dev/%s", dirent->d_name) < 0) {
 				devname[0] = '\0';
-				stack;
+				log_stack;
 			}
 			break;
 		}
@@ -2474,7 +2474,7 @@ try_partition:
 
 		if (dm_snprintf(devname, sizeof(devname), "/dev/%s", namebuf) < 0) {
 			devname[0] = '\0';
-			stack;
+			log_stack;
 		}
 		break;
 	}

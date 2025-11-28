@@ -188,7 +188,7 @@ static int _lock_vol(struct cmd_context *cmd, const char *resource, uint32_t fla
 		/* ensure signals are blocked while VG_GLOBAL lock is held */
 		_update_vg_lock_count(resource, flags);
 	else
-		stack;
+		log_stack;
 
 	_unblock_signals();
 
@@ -315,7 +315,7 @@ int activate_lvs(struct cmd_context *cmd, struct dm_list *lvs, unsigned exclusiv
 			dm_list_uniterate(lvh, lvs, &lvl->list) {
 				lvl = dm_list_item(lvh, struct lv_list);
 				if (!deactivate_lv(cmd, lvl->lv))
-					stack;
+					log_stack;
 			}
 			return 0;
 		}

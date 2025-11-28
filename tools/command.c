@@ -641,7 +641,7 @@ static void _set_opt_def(struct cmd_context *cmdtool, struct command *cmd, char 
 
 			if (!def->str) {
 				/* FIXME */
-				stack;
+				log_stack;
 				return;
 			}
 		}
@@ -1438,7 +1438,7 @@ int define_commands(struct cmd_context *cmdtool, const char *run_name)
 
 				if (!newdesc) {
 					/* FIXME */
-					stack;
+					log_stack;
 					return 0;
 				}
 
@@ -1449,7 +1449,7 @@ int define_commands(struct cmd_context *cmdtool, const char *run_name)
 				cmd->desc = newdesc;
 			} else if (!(cmd->desc = dm_pool_strdup(cmdtool->libmem, line_orig))) {
 				/* FIXME */
-				stack;
+				log_stack;
 				return 0;
 			}
 

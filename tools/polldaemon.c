@@ -143,7 +143,7 @@ static int _sleep_and_rescan_devices(struct cmd_context *cmd, struct daemon_parm
 		if (!_nanosleep(parms->interval, 0))
 			return_0;
 		if (!lvmcache_label_scan(cmd))
-			stack;
+			log_stack;
 	}
 
 	return 1;
@@ -163,7 +163,7 @@ int wait_for_single_lv(struct cmd_context *cmd, struct poll_operation_id *id,
 
 	if (!wait_before_testing)
 		if (!lvmcache_label_scan(cmd))
-			stack;
+			log_stack;
 
 	/* Poll for completion */
 	while (!finished) {
@@ -234,7 +234,7 @@ int wait_for_single_lv(struct cmd_context *cmd, struct poll_operation_id *id,
 		unlock_and_release_vg(cmd, vg, vg->name);
 
 		if (is_lockd && !lockd_vg(cmd, id->vg_name, "un", 0, &lockd_state))
-			stack;
+			log_stack;
 
 		wait_before_testing = 1;
 	}
@@ -245,7 +245,7 @@ out:
 	if (vg)
 		unlock_and_release_vg(cmd, vg, vg->name);
 	if (is_lockd && !lockd_vg(cmd, id->vg_name, "un", 0, &lockd_state))
-		stack;
+		log_stack;
 
 	return ret;
 }
@@ -366,7 +366,7 @@ static int _poll_vg(struct cmd_context *cmd, const char *vgname,
 		if (parms->lv_type && !(lv->status & parms->lv_type))
 			continue;
 		if (!_check_lv_status(cmd, vg, lv, idl->id->display_name, parms, &finished)) {
-			stack;
+			log_stack;
 			goto err;
 		}
 		if (!finished)
@@ -391,9 +391,9 @@ static int _poll_for_all_vgs(struct cmd_context *cmd,
 		parms->outstanding_count = 0;
 		r = process_each_vg(cmd, 0, NULL, NULL, NULL, READ_FOR_UPDATE, 0, handle, _poll_vg);
 		if (!lock_global(cmd, "un"))
-			stack;
+			log_stack;
 		if (r != ECMD_PROCESSED) {
-			stack;
+			log_stack;
 			break;
 		}
 		if (!parms->outstanding_count)
@@ -552,7 +552,7 @@ static int _lvmpolld_poll_for_all_vgs(struct cmd_context *cmd,
 				dm_list_del(&idl->list);
 			else if (!parms->aborting) {
 				if (!_report_progress(cmd, idl->id, lpdp.parms))
-					stack;
+					log_stack;
 			}
 		}
 
@@ -611,7 +611,7 @@ static int _lvmpoll_daemon(struct cmd_context *cmd, struct poll_operation_id *id
 	}
 
 	if (!(r = _lvmpolld_poll_for_all_vgs(cmd, parms, handle)))
-		stack;
+		log_stack;
 
 	destroy_processing_handle(cmd, handle);
 
@@ -655,7 +655,7 @@ static int _poll_daemon(struct cmd_context *cmd, struct poll_operation_id *id,
 
 	if (id) {
 		if (!wait_for_single_lv(cmd, id, parms)) {
-			stack;
+			log_stack;
 			ret = ECMD_FAILED;
 		}
 	} else {

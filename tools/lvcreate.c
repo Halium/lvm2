@@ -1846,12 +1846,12 @@ int lvcreate(struct cmd_context *cmd, int argc, char **argv)
 	int ret;
 
 	if (!_lvcreate_params(cmd, argc, argv, &lp, &lcp)) {
-		stack;
+		log_stack;
 		return EINVALID_CMD_LINE;
 	}
 
 	if (!_check_pool_parameters(cmd, NULL, &lp, &lcp)) {
-		stack;
+		log_stack;
 		return EINVALID_CMD_LINE;
 	}
 
@@ -1927,7 +1927,7 @@ int lvcreate_and_attach_writecache_cmd(struct cmd_context *cmd, int argc, char *
 	};
 	int ret;
 	if (!_lvcreate_params(cmd, argc, argv, &lp, &lcp)) {
-		stack;
+		log_stack;
 		return EINVALID_CMD_LINE;
 	}
 
@@ -2001,7 +2001,7 @@ int lvcreate_and_attach_cache_cmd(struct cmd_context *cmd, int argc, char **argv
 	int ret;
 
 	if (!_lvcreate_params(cmd, argc, argv, &lp, &lcp)) {
-		stack;
+		log_stack;
 		return EINVALID_CMD_LINE;
 	}
 

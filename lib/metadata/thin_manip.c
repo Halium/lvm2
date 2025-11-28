@@ -524,7 +524,7 @@ int thin_pool_prepare_metadata(struct logical_volume *metadata_lv,
 	else if (fflush(f))
 		log_sys_error("fflush", md_path);
 	else if (!(r = exec_cmd(cmd, argv, &status, 1)))
-		stack;
+		log_stack;
 
 	if (fclose(f))
 		log_sys_debug("fclose", md_path);
@@ -647,7 +647,7 @@ int update_thin_pool_lv(struct logical_volume *lv, int activate)
 			activate = 0; /* Was already active */
 
 		if (!(ret = _check_pool_create(lv)))
-			stack; /* Safety guard, needs local presence of thin-pool target */
+			log_stack; /* Safety guard, needs local presence of thin-pool target */
 		else {
 			if (!(ret = suspend_lv_origin(lv->vg->cmd, lv)))
 				/* Send messages */

@@ -278,7 +278,7 @@ char *lvseg_kernel_discards_dup(struct dm_pool *mem, const struct lv_segment *se
 		goto_bad;
 
 	if (!(ret = lvseg_kernel_discards_dup_with_info_and_seg_status(mem, &status)))
-		stack;
+		log_stack;
 bad:
 	dm_pool_destroy(status.seg_status.mem);
 
@@ -665,7 +665,7 @@ struct logical_volume *lv_parent(const struct logical_volume *lv)
 		 (lv_is_cache_pool_data(lv) || lv_is_cache_pool_metadata(lv)) ||
 		 (lv_is_thin_pool_data(lv) || lv_is_thin_pool_metadata(lv))) {
 		if (!(seg = get_only_segment_using_this_lv(lv)))
-			stack;
+			log_stack;
 		else
 			parent_lv = seg->lv;
 	}

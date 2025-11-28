@@ -301,7 +301,7 @@ static int _get_segment_status_from_target_params(const char *target_name,
 		seg_status->type = SEG_STATUS_SNAPSHOT;
 	} else if (segtype_is_vdo_pool(segtype)) {
 		if (!_vdo_pool_message_stats(seg_status->mem, seg->lv, &seg_status->vdo_pool))
-			stack;
+			log_stack;
 		if (!parse_vdo_pool_status(seg_status->mem, seg->lv, params, dminfo, &seg_status->vdo_pool))
 			return_0;
 		seg_status->type = SEG_STATUS_VDO_POOL;
@@ -409,7 +409,7 @@ static int _info_run(const char *dlid, struct dm_info *dminfo,
 
 		if (!target_name ||
 		    !_get_segment_status_from_target_params(target_name, target_params, dminfo, seg_status))
-			stack;
+			log_stack;
 	}
 
 	r = 1;
@@ -502,7 +502,7 @@ static int _ignore_blocked_mirror_devices(struct cmd_context *cmd,
 					         .check_error_target = 1,
 					         .check_reserved = 0 }, NULL))
 				goto out; /* safe to use */
-			stack;
+			log_stack;
 		}
 	}
 
@@ -668,7 +668,7 @@ static int _ignore_invalid_snapshot(const char *params)
 		return_0;
 
 	if (!dm_get_status_snapshot(mem, params, &s))
-		stack;
+		log_stack;
         else
 		r = s->invalid;
 
@@ -687,7 +687,7 @@ static int _ignore_frozen_raid(struct device *dev, const char *params)
 		return_0;
 
 	if (!dm_get_status_raid(mem, params, &s))
-		stack;
+		log_stack;
 	else if (s->sync_action && !strcmp(s->sync_action, "frozen")) {
 		log_warn("WARNING: %s frozen raid device (%u:%u) needs inspection.",
 			 dev_name(dev), MAJOR(dev->dev), MINOR(dev->dev));
@@ -1117,7 +1117,7 @@ int dev_manager_info(struct cmd_context *cmd,
 	if (!(r = _info(cmd, name, dlid,
 			with_open_count, with_read_ahead, with_name_check,
 			dminfo, read_ahead, seg_status)))
-		stack;
+		log_stack;
 out:
 	dm_pool_free(cmd->mem, name);
 
@@ -2090,7 +2090,7 @@ int dev_manager_vdo_pool_status(struct dev_manager *dm,
 	}
 
 	if (!_vdo_pool_message_stats(dm->mem, lv, *status))
-		stack;
+		log_stack;
 
 	if (!parse_vdo_pool_status(dm->mem, lv, params, &info, *status))
 		goto_out;

@@ -109,7 +109,7 @@ static int _dev_get_size_dev(struct device *dev, uint64_t *size)
 	if (ioctl(fd, BLKGETSIZE64, size) < 0) {
 		log_warn("WARNING: %s: ioctl BLKGETSIZE64 %s", name, strerror(errno));
 		if (do_close && !dev_close_immediate(dev))
-			stack;
+			log_stack;
 		return 0;
 	}
 
@@ -120,7 +120,7 @@ static int _dev_get_size_dev(struct device *dev, uint64_t *size)
 	log_very_verbose("%s: size is %" PRIu64 " sectors", name, *size);
 
 	if (do_close && !dev_close_immediate(dev))
-		stack;
+		log_stack;
 
 	return 1;
 }
@@ -143,7 +143,7 @@ static int _dev_read_ahead_dev(struct device *dev, uint32_t *read_ahead)
 	if (ioctl(dev->fd, BLKRAGET, &read_ahead_long) < 0) {
 		log_warn("WARNING: %s: ioctl BLKRAGET %s.", dev_name(dev), strerror(errno));
 		if (!dev_close_immediate(dev))
-			stack;
+			log_stack;
 		return 0;
 	}
 
@@ -154,7 +154,7 @@ static int _dev_read_ahead_dev(struct device *dev, uint32_t *read_ahead)
 			 dev_name(dev), *read_ahead);
 
 	if (!dev_close_immediate(dev))
-		stack;
+		log_stack;
 
 	return 1;
 }
@@ -177,13 +177,13 @@ static int _dev_discard_blocks(struct device *dev, uint64_t offset_bytes, uint64
 		log_warn("WARNING: %s: ioctl BLKDISCARD at offset %" PRIu64 " size %" PRIu64 " failed: %s.",
 			  dev_name(dev), offset_bytes, size_bytes, strerror(errno));
 		if (!dev_close_immediate(dev))
-			stack;
+			log_stack;
 		/* It doesn't matter if discard failed, so return success. */
 		return 1;
 	}
 
 	if (!dev_close_immediate(dev))
-		stack;
+		log_stack;
 
 	return 1;
 }
@@ -216,7 +216,7 @@ int dev_get_direct_block_sizes(struct device *dev, unsigned int *physical_block_
 	 * without reverting to read-modify-write operations"
 	 */
 	if (ioctl(fd, BLKPBSZGET, &pbs)) {
-		stack;
+		log_stack;
 		pbs = 0;
 	}
 #endif
@@ -226,7 +226,7 @@ int dev_get_direct_block_sizes(struct device *dev, unsigned int *physical_block_
 	 * "the lowest possible block size that the storage device can address."
 	 */
 	if (ioctl(fd, BLKSSZGET, &lbs)) {
-		stack;
+		log_stack;
 		lbs = 0;
 	}
 
@@ -237,7 +237,7 @@ int dev_get_direct_block_sizes(struct device *dev, unsigned int *physical_block_
 	*logical_block_size = lbs;
 
 	if (do_close && !dev_close_immediate(dev))
-		stack;
+		log_stack;
 
 	return 1;
 }
@@ -410,7 +410,7 @@ int dev_open_flags(struct device *dev, int flags, int direct, int quiet)
 	    ((fstat(dev->fd, &buf) < 0) || (buf.st_rdev != dev->dev))) {
 		log_error("%s: fstat failed: Has device name changed?", name);
 		if (!dev_close_immediate(dev))
-			stack;
+			log_stack;
 		return 0;
 	}
 

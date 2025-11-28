@@ -178,12 +178,12 @@ static char *_program_id_from_proc(void)
 	if (!fgets(buf, sizeof(buf), comm)) {
 		log_error("Could not read from %s", PROC_SELF_COMM);
 		if (fclose(comm))
-			stack;
+			log_stack;
 		return NULL;
 	}
 
 	if (fclose(comm))
-		stack;
+		log_stack;
 
 	return dm_strdup(buf);
 }
@@ -873,7 +873,7 @@ static int _stats_parse_histogram_spec(struct dm_stats *dms,
 			if (*c == *v)
 				break;
 		if (!*v) {
-			stack;
+			log_stack;
 			goto badchar;
 		}
 
@@ -897,7 +897,7 @@ static int _stats_parse_histogram_spec(struct dm_stats *dms,
 			if (*c == ',')
 				c++;
 			else if (*c || (*c == ' ')) { /* Expected ',' or NULL. */
-				stack;
+				log_stack;
 				goto badchar;
 			}
 
@@ -1147,13 +1147,13 @@ static int _stats_parse_list(struct dm_stats *dms, const char *resp)
 	_stats_update_groups(dms);
 
 	if (fclose(list_rows))
-		stack;
+		log_stack;
 
 	return 1;
 
 bad:
 	if (fclose(list_rows))
-		stack;
+		log_stack;
 	dm_pool_abandon_object(mem);
 	dm_pool_abandon_object(group_mem);
 
@@ -1416,14 +1416,14 @@ static int _stats_parse_region(struct dm_stats *dms, const char *resp,
 	region->counters = dm_pool_end_object(mem);
 
 	if (fclose(stats_rows))
-		stack;
+		log_stack;
 
 	return 1;
 
 bad:
 	if (stats_rows)
 		if (fclose(stats_rows))
-			stack;
+			log_stack;
 	dm_pool_abandon_object(mem);
 
 	return 0;
@@ -3639,7 +3639,7 @@ struct dm_histogram *dm_histogram_bounds_from_string(const char *bounds_str)
 				break;
 
 		if (!*v) {
-			stack;
+			log_stack;
 			goto badchar;
 		}
 
@@ -3669,14 +3669,14 @@ struct dm_histogram *dm_histogram_bounds_from_string(const char *bounds_str)
 				else if (*c == 'n')
 					mult = 1;
 				else {
-					stack;
+					log_stack;
 					goto badchar;
 				}
 				c += 2; /* Advance over 'ms', 'us', or 'ns'. */
 			} else if (*c == ',')
 				c++;
 			else if (*c) { /* Expected ',' or NULL. */
-				stack;
+				log_stack;
 				goto badchar;
 			}
 
@@ -3745,7 +3745,7 @@ void dm_histogram_bounds_destroy(struct dm_histogram *bounds)
 	if (bounds->dms || bounds->region) {
 		log_error("Freeing invalid histogram bounds pointer %p.",
 			  (void *) bounds);
-		stack;
+		log_stack;
 	}
 	/* dm_free() expects a (void *). */
 	dm_free((void *) bounds);

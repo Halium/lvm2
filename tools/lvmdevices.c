@@ -710,7 +710,7 @@ int lvmdevices(struct cmd_context *cmd, int argc, char **argv)
 					log_print("Adding multipath device %s for multipath component %s.",
 						  dev_name(mpath_dev), dev_name(du->dev));
 					if (!device_id_add(cmd, mpath_dev, dev->pvid, NULL, NULL, 0))
-						stack;
+						log_stack;
 				} else {
 					log_print_unless_silent("Missing multipath device %s for multipath component %s.",
 						dev_name(mpath_dev), dev_name(du->dev));

@@ -290,7 +290,7 @@ static int read_key_file(struct cmd_context *cmd, struct volume_group *vg,
 	}
 
 	if (fclose(fp))
-		stack;
+		log_stack;
 
 	if (!buf_key[0]) {
 		log_debug("key_file: empty");
@@ -1677,7 +1677,7 @@ int persist_vgremove_before(struct cmd_context *cmd, struct volume_group *vg, st
 void persist_vgremove_after(struct cmd_context *cmd, struct volume_group *vg, struct dm_list *devs, char *key)
 {
 	if (!_run_stop(cmd, vg, devs, key, 0))
-		stack;
+		log_stack;
 
 	persist_key_file_remove(cmd, vg);
 }
@@ -2056,7 +2056,7 @@ int persist_vgcreate_update(struct cmd_context *cmd, struct volume_group *vg, ui
 	}
 
 	if (!write_key_file(cmd, vg, our_key_val))
-		stack;
+		log_stack;
 
 	return 1;
 }
@@ -2459,7 +2459,7 @@ int persist_start(struct cmd_context *cmd, struct volume_group *vg,
 
 	/* key file is an optimization, not an error condition */
 	if (!write_key_file(cmd, vg, our_key_val))
-		stack;
+		log_stack;
 
 	return 1;
 

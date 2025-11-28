@@ -134,7 +134,7 @@ static const char *_read_system_id_from_file(struct cmd_context *cmd, const char
 	free(line);
 
 	if (fclose(fp))
-		stack;
+		log_stack;
 
 	return system_id;
 }
@@ -172,7 +172,7 @@ static const char *_system_id_from_source(struct cmd_context *cmd, const char *s
 				 strerror(errno), errno);
 
 		if (dm_snprintf(buf, PATH_MAX, SD_ID128_FORMAT_STR, SD_ID128_FORMAT_VAL(id)) < 0)
-			stack;
+			log_stack;
 		system_id = system_id_from_string(cmd, buf);
 		goto out;
 	}
@@ -1877,7 +1877,7 @@ int refresh_filters(struct cmd_context *cmd)
 
 	_destroy_filters(cmd);
 	if (!(r = init_filters(cmd, 0)))
-                stack;
+                log_stack;
 
 	/*
 	 * During repair code must not reset suspended flag.
@@ -1909,7 +1909,7 @@ int refresh_toolcontext(struct cmd_context *cmd)
 	_destroy_formats(cmd, &cmd->formats);
 
 	if (!dev_cache_exit())
-		stack;
+		log_stack;
 	_destroy_dev_types(cmd);
 	_destroy_tags(cmd);
 

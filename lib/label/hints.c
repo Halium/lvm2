@@ -233,7 +233,7 @@ static int _touch_newhints(void)
 	if (!(fp = fopen(_newhints_file, "w")))
 		return_0;
 	if (fclose(fp))
-		stack;
+		log_stack;
 	log_debug("newhints created");
 	return 1;
 }
@@ -245,7 +245,7 @@ static int _touch_nohints(void)
 	if (!(fp = fopen(_nohints_file, "w")))
 		return_0;
 	if (fclose(fp))
-		stack;
+		log_stack;
 	return 1;
 }
 
@@ -360,7 +360,7 @@ static void _unlock_hints(struct cmd_context *cmd)
 		log_warn("unlock_hints flock errno %d", errno);
 
 	if (close(_hints_fd))
-		stack;
+		log_stack;
 	_hints_fd = -1;
 }
 
@@ -597,7 +597,7 @@ out:
 		 * we don't want to take an ex lock here.
 		 */
 		if (!_touch_newhints())
-			stack;
+			log_stack;
 	}
 
 	return ret;
@@ -1117,7 +1117,7 @@ int write_hint_file(struct cmd_context *cmd, int newhints)
 
  out_flush:
 	if (fflush(fp))
-		stack;
+		log_stack;
 
 	log_debug("Wrote hint file with devs_hash %u count %u", hash, count);
 
@@ -1197,15 +1197,15 @@ void clear_hint_file(struct cmd_context *cmd)
 
 	/* limit potential delay blocking on hints lock next */
 	if (!_touch_nohints())
-		stack;
+		log_stack;
 
 	if (!_lock_hints(cmd, LOCK_EX, 0))
-		stack;
+		log_stack;
 
 	_unlink_nohints();
 
 	if (!_clear_hints(cmd))
-		stack;
+		log_stack;
 
 	/*
 	 * Creating a newhints file here is not necessary, since
@@ -1213,7 +1213,7 @@ void clear_hint_file(struct cmd_context *cmd)
 	 * is more efficient if it sees a newhints file first.
 	 */
 	if (!_touch_newhints())
-		stack;
+		log_stack;
 }
 
 /*
@@ -1229,21 +1229,21 @@ void pvscan_recreate_hints_begin(struct cmd_context *cmd)
 	log_debug("pvscan_recreate_hints_begin");
 
 	if (!_touch_hints()) {
-		stack;
+		log_stack;
 		return;
 	}
 
 	/* limit potential delay blocking on hints lock next */
 	if (!_touch_nohints())
-		stack;
+		log_stack;
 
 	if (!_lock_hints(cmd, LOCK_EX, 0))
-		stack;
+		log_stack;
 
 	_unlink_nohints();
 
 	if (!_clear_hints(cmd))
-		stack;
+		log_stack;
 }
 
 /*
@@ -1258,7 +1258,7 @@ void invalidate_hints(struct cmd_context *cmd)
 		return;
 
 	if (!_touch_newhints())
-		stack;
+		log_stack;
 }
 
 /*

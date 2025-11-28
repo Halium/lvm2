@@ -240,7 +240,7 @@ int lock_file(const char *file, uint32_t flags)
 	else {
 		free(ll->res);
 		free(ll);
-		stack;
+		log_stack;
 	}
 
 	return r;

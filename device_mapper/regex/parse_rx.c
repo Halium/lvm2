@@ -376,7 +376,7 @@ static struct rx_node *_cat_term(struct parse_sp *ps)
 		return l;
 
 	if (!(n = _node(ps->mem, CAT, l, r)))
-		stack;
+		log_stack;
 
 	return n;
 }
@@ -399,7 +399,7 @@ static struct rx_node *_or_term(struct parse_sp *ps)
 	}
 
 	if (!(n = _node(ps->mem, OR, l, r)))
-		stack;
+		log_stack;
 
 	return n;
 }

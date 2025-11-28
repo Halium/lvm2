@@ -75,7 +75,7 @@ static int _pvscan_display_pv(struct cmd_context *cmd,
 
 	if (arg_is_set(cmd, uuid_ARG)) {
 		if (!id_write_format(&pv->id, uuid, sizeof(uuid))) {
-			stack;
+			log_stack;
 			return ECMD_FAILED;
 		}
 
@@ -1235,7 +1235,7 @@ static int _online_devs(struct cmd_context *cmd, int do_all, struct dm_list *pvs
 			} else {
 				log_print_pvscan(cmd, "PV %s online, VG %s is complete.", dev_name(dev), vgname);
 				if (!str_list_add(cmd->mem, complete_vgnames, dm_pool_strdup(cmd->mem, vgname)))
-					stack;
+					log_stack;
 				vg_complete = 1;
 			}
 		}
@@ -1777,7 +1777,7 @@ int pvscan_cache_cmd(struct cmd_context *cmd, int argc, char **argv)
 		ret = ECMD_FAILED;
 
 	if (!sync_local_dev_names(cmd))
-		stack;
+		log_stack;
 	return ret;
 }
 

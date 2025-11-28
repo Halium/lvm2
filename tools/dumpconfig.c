@@ -338,7 +338,7 @@ int dumpconfig(struct cmd_context *cmd, int argc, char **argv)
 	}
 
 	if (!config_write(cft, &tree_spec, file, argc, argv)) {
-		stack;
+		log_stack;
 		r = ECMD_FAILED;
 	}
 out:

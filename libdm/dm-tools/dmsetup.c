@@ -666,7 +666,7 @@ static int _do_timerfd_wait(void)
 	/* Final interval? */
 	if (_count == 2) {
 		if (close(_timer_fd))
-			stack;
+			log_stack;
 		/* Tell _update_interval_times() to shut down. */
 		_timer_fd = TIMER_STOPPED;
 	}
@@ -737,7 +737,7 @@ static int _do_usleep_wait(void)
 		else if (errno == EINVAL)
 			log_error("Report interval too short.");
 		else
-			stack; /* other reason */
+			log_stack; /* other reason */
 		return 0;
 	}
 
@@ -3385,7 +3385,7 @@ static int _dm_info_devno_disp(struct dm_report *rh, struct dm_pool *mem,
 	if (private) {
 		if (!dm_device_get_name(info->major, info->minor,
 					1, buf, PATH_MAX)) {
-			stack;
+			log_stack;
 			goto out_abandon;
 		}
 	}
@@ -7159,9 +7159,9 @@ static int _process_switches(int *argcp, char ***argvp, const char *dev_dir)
 		dm_log_init_verbose(_switches[VERBOSE_ARG] - 1);
 		if (_switches[VERBOSE_ARG] > 2) {
 			if (!(_initial_timestamp = dm_timestamp_alloc()))
-				stack;
+				log_stack;
 			else if (!dm_timestamp_get(_initial_timestamp))
-				stack;
+				log_stack;
 			else
 				log_debug("Timestamp:       0.000000000 seconds");
 		}

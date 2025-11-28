@@ -155,21 +155,21 @@ static dm_percent_t _data_percent(const struct logical_volume *lv)
 
 	if (lv_is_cache(lv) || lv_is_used_cache_pool(lv)) {
 		if (!lv_cache_status(lv, &cache_status))
-			stack;
+			log_stack;
 		else {
 			percent = cache_status->data_usage;
 			dm_pool_destroy(cache_status->mem);
 		}
 	} else  if (lv_is_thin_volume(lv)) {
 		if (!lv_thin_status(lv, 0, &thin_status))
-			stack;
+			log_stack;
 		else {
 			percent = thin_status->usage;
 			dm_pool_destroy(thin_status->mem);
 		}
 	} else if (lv_is_thin_pool(lv)) {
 		if (!lv_thin_pool_status(lv, 0, &thin_pool_status))
-			stack;
+			log_stack;
 		else {
 			percent = thin_pool_status->data_usage;
 			dm_pool_destroy(thin_pool_status->mem);
@@ -187,14 +187,14 @@ static dm_percent_t _metadata_percent(const struct logical_volume *lv)
 
 	if (lv_is_cache(lv) || lv_is_used_cache_pool(lv)) {
 		if (!lv_cache_status(lv, &cache_status))
-			stack;
+			log_stack;
 		else {
 			percent = cache_status->metadata_usage;
 			dm_pool_destroy(cache_status->mem);
 		}
 	} else if (lv_is_thin_pool(lv)) {
 		if (!lv_thin_pool_status(lv, 0, &thin_pool_status))
-			stack;
+			log_stack;
 		else {
 			percent = thin_pool_status->metadata_usage;
 			dm_pool_destroy(thin_pool_status->mem);

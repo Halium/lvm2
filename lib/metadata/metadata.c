@@ -388,7 +388,7 @@ int add_pv_to_vg(struct volume_group *vg, const char *pv_name,
 	if (find_pv_in_vg(vg, pv_name) ||
 	    find_pv_in_vg_by_uuid(vg, &pv->id)) {
 		if (!id_write_format(&pv->id, uuid, sizeof(uuid))) {
-			stack;
+			log_stack;
 			uuid[0] = '\0';
 		}
 		log_error("Physical volume '%s (%s)' already in the VG.",
@@ -685,7 +685,7 @@ int vg_remove_direct(struct volume_group *vg)
 	set_vg_notify(vg->cmd);
 
 	if (!backup_remove(vg->cmd, vg->name))
-		stack;
+		log_stack;
 
 	if (ret)
 		log_print_unless_silent("Volume group \"%s\" successfully removed", vg->name);
@@ -2037,7 +2037,7 @@ static int _lv_postorder_vg(struct volume_group *vg,
 
 	dm_list_iterate_items(lvl, &vg->lvs)
 		if (!_lv_postorder_visit(lvl->lv, fn, data)) {
-			stack;
+			log_stack;
 			r = 0;
 		}
 
@@ -2362,7 +2362,7 @@ int vg_validate(struct volume_group *vg)
 
 			if (!id_write_format(&pvl->pv->id, uuid,
 					     sizeof(uuid)))
-				stack;
+				log_stack;
 			log_error(INTERNAL_ERROR "Duplicate PV id "
 				  "%s detected for %s in %s.",
 				  uuid, pv_dev_name(pvl->pv),
@@ -2417,10 +2417,10 @@ int vg_validate(struct volume_group *vg)
 		if (!id_equal(&lvl->lv->lvid.id[0], &lvl->lv->vg->id)) {
 			if (!id_write_format(&lvl->lv->lvid.id[0], uuid,
 					     sizeof(uuid)))
-				stack;
+				log_stack;
 			if (!id_write_format(&lvl->lv->vg->id, uuid2,
 					     sizeof(uuid2)))
-				stack;
+				log_stack;
 			log_error(INTERNAL_ERROR "LV %s has VG UUID %s but its VG %s has UUID %s",
 				  lvl->lv->name, uuid, lvl->lv->vg->name, uuid2);
 			r = 0;
@@ -2526,7 +2526,7 @@ int vg_validate(struct volume_group *vg)
 
 			if (!id_write_format(&lvl->lv->lvid.id[1], uuid,
 					     sizeof(uuid)))
-				stack;
+				log_stack;
 			log_error(INTERNAL_ERROR "Duplicate LV id %s detected for %s in %s.",
 				  uuid, lvl->lv->name, vg->name);
 		}
@@ -2539,7 +2539,7 @@ int vg_validate(struct volume_group *vg)
 		}
 
 	if (!_lv_postorder_vg(vg, _lv_validate_references_single, &vhash)) {
-		stack;
+		log_stack;
 		r = 0;
 	}
 
@@ -2578,7 +2578,7 @@ int vg_validate(struct volume_group *vg)
 	}
 
 	if (vg_max_lv_reached(vg))
-		stack;
+		log_stack;
 
 	if (!(vhash.lv_lock_args = radix_tree_create(NULL, NULL))) {
 		log_error("Failed to allocate lv_lock_args hash");
@@ -2736,9 +2736,9 @@ int vg_validate(struct volume_group *vg)
 
 		if (!id_equal(&hlv->lvid.id[0], &hlv->vg->id)) {
 			if (!id_write_format(&hlv->lvid.id[0], uuid, sizeof(uuid)))
-				stack;
+				log_stack;
 			if (!id_write_format(&hlv->vg->id, uuid2, sizeof(uuid2)))
-				stack;
+				log_stack;
 			log_error(INTERNAL_ERROR "Historical LV %s has VG UUID %s but its VG %s has UUID %s",
 				  hlv->name, uuid, hlv->vg->name, uuid2);
 			r = 0;
@@ -2763,7 +2763,7 @@ int vg_validate(struct volume_group *vg)
 				goto out;
 			}
 			if (!id_write_format(&hlv->lvid.id[1], uuid,sizeof(uuid)))
-				stack;
+				log_stack;
 			log_error(INTERNAL_ERROR "Duplicate historical LV id %s detected for %s in %s.",
 				  uuid, hlv->name, vg->name);
 		}
@@ -3078,7 +3078,7 @@ int vg_write(struct volume_group *vg)
 				log_warn("WARNING: Failed to write an MDA of VG %s.", vg->name);
 				mda->status |= MDA_FAILED;
 			} else {
-				stack;
+				log_stack;
 				revert = 1;
 				break;
 			}
@@ -3096,7 +3096,7 @@ int vg_write(struct volume_group *vg)
 
 			if (mda->ops->vg_revert &&
 			    !mda->ops->vg_revert(vg->fid, vg, mda)) {
-				stack;
+				log_stack;
 			}
 		}
 		return 0;
@@ -3108,14 +3108,14 @@ int vg_write(struct volume_group *vg)
 			continue;
 		if (mda->ops->vg_precommit &&
 		    !mda->ops->vg_precommit(vg->fid, vg, mda)) {
-			stack;
+			log_stack;
 			/* Revert */
 			dm_list_iterate_items(mda, &vg->fid->metadata_areas_in_use) {
 				if (mda->status & MDA_FAILED)
 					continue;
 				if (mda->ops->vg_revert &&
 				    !mda->ops->vg_revert(vg->fid, vg, mda)) {
-					stack;
+					log_stack;
 				}
 			}
 			return 0;
@@ -3147,7 +3147,7 @@ static int _vg_commit_mdas(struct volume_group *vg)
 			continue;
 		if (mda->ops->vg_commit &&
 		    !mda->ops->vg_commit(vg->fid, vg, mda)) {
-			stack;
+			log_stack;
 		} else
 			good++;
 	}
@@ -3202,7 +3202,7 @@ void vg_revert(struct volume_group *vg)
 	dm_list_iterate_items(mda, &vg->fid->metadata_areas_in_use) {
 		if (mda->ops->vg_revert &&
 		    !mda->ops->vg_revert(vg->fid, vg, mda)) {
-			stack;
+			log_stack;
 		}
 	}
 }
@@ -3222,7 +3222,7 @@ static int _vg_read_orphan_pv(struct lvmcache_info *info, void *baton)
 	uint32_t ext_flags;
 
 	if (!(pv = _pv_read(b->cmd, b->fmt, b->vg, info))) {
-		stack;
+		log_stack;
 		return 1;
 	}
 
@@ -3249,7 +3249,7 @@ static int _vg_read_orphan_pv(struct lvmcache_info *info, void *baton)
 
 	/*
 	if (!_check_or_repair_orphan_pv_ext(pv, info, baton)) {
-		stack;
+		log_stack;
 		return 0;
 	}
 	*/

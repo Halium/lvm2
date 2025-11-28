@@ -914,7 +914,7 @@ static struct field_properties * _add_field(struct dm_report *rh,
 	}
 
 	if (!_copy_field(rh, fp, field_num, implicit)) {
-		stack;
+		log_stack;
 		dm_pool_free(rh->mem, fp);
 		return NULL;
 	}
@@ -3782,7 +3782,7 @@ static struct field_selection *_create_field_selection(struct dm_report *rh,
 	}
 
 	if (!(fs->value = dm_pool_zalloc(rh->selection->mem, sizeof(struct field_selection_value)))) {
-		stack;
+		log_stack;
 		goto error_field_id;
 	}
 
@@ -3791,7 +3791,7 @@ static struct field_selection *_create_field_selection(struct dm_report *rh,
 	      custom && ((struct time_value *) custom)->range))
 		 &&
 	    !(fs->value->next = dm_pool_zalloc(rh->selection->mem, sizeof(struct field_selection_value)))) {
-		stack;
+		log_stack;
 		goto error_field_id;
 	}
 

@@ -129,7 +129,7 @@ static int _activate_lvs_in_vg(struct cmd_context *cmd, struct volume_group *vg,
 		expected_count++;
 
 		if (!lv_change_activate(cmd, lv, activate)) {
-			stack;
+			log_stack;
 			r = 0;
 			continue;
 		}
@@ -152,7 +152,7 @@ static int _activate_lvs_in_vg(struct cmd_context *cmd, struct volume_group *vg,
 	 */
 	if (count && is_change_activating(activate) &&
 	    !vgchange_background_polling(cmd, vg)) {
-		stack;
+		log_stack;
 		r = 0;
 	}
 
@@ -296,7 +296,7 @@ int vgchange_activate(struct cmd_context *cmd, struct volume_group *vg,
 	}
 
 	if (!_activate_lvs_in_vg(cmd, vg, activate)) {
-		stack;
+		log_stack;
 		r = 0;
 	}
 
@@ -346,7 +346,7 @@ int vgchange_activate(struct cmd_context *cmd, struct volume_group *vg,
 			goto out;
 		}
 		if (fclose(fp))
-			stack;
+			log_stack;
 	}
 out:
 	/* Print message only if there was not found a missing VG */
@@ -895,7 +895,7 @@ static void _get_rootvg_dev(struct cmd_context *cmd, char **dm_uuid_out)
 		return;
 
 	if (!get_rootvg_dev_uuid(cmd, dm_uuid_out))
-		stack;
+		log_stack;
 }
 
 static int _vgchange_autoactivation_setup(struct cmd_context *cmd,
@@ -1571,7 +1571,7 @@ int vgchange_lock_start_stop_cmd(struct cmd_context *cmd, int argc, char **argv)
 
 	if (arg_is_set(cmd, lockstart_ARG) && vp.lock_start_count) {
 		if (!lockd_global(cmd, "un"))
-			stack;
+			log_stack;
 
 		if ((cmd->lockopt & LOCKOPT_NOWAIT) || (cmd->lockopt & LOCKOPT_AUTONOWAIT)) {
 			log_print_unless_silent("Starting locking.  VG can only be read until locks are ready.");

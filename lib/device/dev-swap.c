@@ -43,7 +43,7 @@ int dev_is_swap(struct cmd_context *cmd, struct device *dev, uint64_t *offset_fo
 	int ret = 0;
 
 	if (!dev_get_size(dev, &size)) {
-		stack;
+		log_stack;
 		return -1;
 	}
 

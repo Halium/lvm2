@@ -990,7 +990,7 @@ int lv_check_not_in_use(const struct logical_volume *lv, int error_if_used)
 		log_debug_activation("Retrying open_count check for %s.",
 				     display_lvname(lv));
 		if (!lv_info(lv->vg->cmd, lv, 0, &info, 1, 0) || !info.exists) {
-			stack; /* device disappeared? */
+			log_stack; /* device disappeared? */
 			return 1;
 		} else if (!info.open_count)
 			return 1;
@@ -1021,7 +1021,7 @@ int lv_check_transient(struct logical_volume *lv)
 		return_0;
 
 	if (!(r = dev_manager_transient(dm, lv)))
-		stack;
+		log_stack;
 
 	dev_manager_destroy(dm);
 
@@ -1046,7 +1046,7 @@ int lv_snapshot_percent(const struct logical_volume *lv, dm_percent_t *percent)
 		return_0;
 
 	if (!(r = dev_manager_snapshot_percent(dm, lv, percent)))
-		stack;
+		log_stack;
 
 	dev_manager_destroy(dm);
 
@@ -1077,7 +1077,7 @@ int lv_mirror_percent(struct cmd_context *cmd, const struct logical_volume *lv,
 		return_0;
 
 	if (!(r = dev_manager_mirror_percent(dm, lv, wait, percent, event_nr)))
-		stack;
+		log_stack;
 
 	dev_manager_destroy(dm);
 
@@ -1127,7 +1127,7 @@ int lv_raid_dev_health(const struct logical_volume *lv, char **dev_health)
 
 	if (!(*dev_health = dm_pool_strdup(lv->vg->cmd->mem,
 					  raid_status->raid->dev_health))) {
-		stack;
+		log_stack;
                 r = 0;
 	}
 
@@ -1200,7 +1200,7 @@ int lv_raid_sync_action(const struct logical_volume *lv, char **sync_action)
 	if (!raid_status->raid->sync_action ||
 	    !(*sync_action = dm_pool_strdup(lv->vg->cmd->mem,
 					    raid_status->raid->sync_action))) {
-		stack;
+		log_stack;
 		r = 0;
 	}
 
@@ -1292,7 +1292,7 @@ int lv_raid_status(const struct logical_volume *lv, struct lv_status_raid **stat
 	if (!dev_manager_raid_status(dm, lv, status, &exists)) {
 		dev_manager_destroy(dm);
 		if (exists)
-			stack;
+			log_stack;
 		return 0;
 	}
 	/* User has to call dm_pool_destroy(status->mem)! */
@@ -1356,7 +1356,7 @@ int lv_cache_status(const struct logical_volume *cache_lv,
 	if (!dev_manager_cache_status(dm, cache_lv, status, &exists)) {
 		dev_manager_destroy(dm);
 		if (exists)
-			stack;
+			log_stack;
 		return 0;
 	}
 	/* User has to call dm_pool_destroy(status->mem)! */
@@ -1376,7 +1376,7 @@ int lv_thin_pool_status(const struct logical_volume *lv, int flush,
 	if (!dev_manager_thin_pool_status(dm, lv, flush, thin_pool_status, &exists)) {
 		dev_manager_destroy(dm);
 		if (exists)
-			stack;
+			log_stack;
 		return 0;
 	}
 
@@ -1397,7 +1397,7 @@ int lv_thin_status(const struct logical_volume *lv, int flush,
 	if (!dev_manager_thin_status(dm, lv, flush, thin_status, &exists)) {
 		dev_manager_destroy(dm);
 		if (exists)
-			stack;
+			log_stack;
 		return 0;
 	}
 
@@ -1417,7 +1417,7 @@ int lv_thin_device_id(const struct logical_volume *lv, uint32_t *device_id)
 
 	if (!(r = dev_manager_thin_device_id(dm, lv, device_id, &exists)))
 		if (exists)
-			stack;
+			log_stack;
 
 	dev_manager_destroy(dm);
 
@@ -1443,7 +1443,7 @@ int lv_vdo_pool_status(const struct logical_volume *lv, int flush,
 	if (!dev_manager_vdo_pool_status(dm, lv, flush, vdo_status, &exists)) {
 		dev_manager_destroy(dm);
 		if (exists)
-			stack;
+			log_stack;
 		return 0;
 	}
 
@@ -1510,7 +1510,7 @@ static int _lv_open_count(struct cmd_context *cmd, const struct logical_volume *
 	struct lvinfo info;
 
 	if (!lv_info(cmd, lv, 0, &info, 1, 0)) {
-		stack;
+		log_stack;
 		return -1;
 	}
 
@@ -1526,7 +1526,7 @@ static int _lv_activate_lv(const struct logical_volume *lv, struct lv_activate_o
 		return_0;
 
 	if (!(r = dev_manager_activate(dm, lv, laopts)))
-		stack;
+		log_stack;
 
 	dev_manager_destroy(dm);
 	return r;
@@ -1545,7 +1545,7 @@ static int _lv_preload(const struct logical_volume *lv, struct lv_activate_opts 
 	laopts->read_only = _passes_readonly_filter(lv->vg->cmd, lv);
 
 	if (!(r = dev_manager_preload(dm, lv, laopts, flush_required)))
-		stack;
+		log_stack;
 
 	dev_manager_destroy(dm);
 
@@ -1563,7 +1563,7 @@ static int _lv_deactivate(const struct logical_volume *lv)
 		return_0;
 
 	if (!(r = dev_manager_deactivate(dm, lv)))
-		stack;
+		log_stack;
 
 	dev_manager_destroy(dm);
 	return r;
@@ -1585,7 +1585,7 @@ static int _lv_suspend_lv(const struct logical_volume *lv, struct lv_activate_op
 		return_0;
 
 	if (!(r = dev_manager_suspend(dm, lv, laopts, lockfs, flush_required)))
-		stack;
+		log_stack;
 
 	dev_manager_destroy(dm);
 	return r;
@@ -1919,7 +1919,7 @@ int monitor_dev_for_events(struct cmd_context *cmd, const struct logical_volume 
 	if (lv_is_cow(lv) && (laopts->no_merging || !lv_is_merging_cow(lv) ||
 			      lv_has_target_type(lv->vg->cmd->mem, lv, NULL, TARGET_NAME_SNAPSHOT))) {
 		if (!(r = monitor_dev_for_events(cmd, lv->snapshot->lv, NULL, monitor)))
-			stack;
+			log_stack;
 		return r;
 	}
 
@@ -1935,7 +1935,7 @@ int monitor_dev_for_events(struct cmd_context *cmd, const struct logical_volume 
 		dm_list_iterate_safe(snh, snht, &lv->snapshot_segs)
 			if (!monitor_dev_for_events(cmd, dm_list_struct_base(snh,
 				struct lv_segment, origin_list)->cow, NULL, monitor)) {
-				stack;
+				log_stack;
 				r = 0;
 			}
 
@@ -1947,13 +1947,13 @@ int monitor_dev_for_events(struct cmd_context *cmd, const struct logical_volume 
 	    (log_seg = first_seg(seg->log_lv)) != NULL &&
 	    seg_is_mirrored(log_seg))
 		if (!monitor_dev_for_events(cmd, seg->log_lv, NULL, monitor)) {
-			stack;
+			log_stack;
 			r = 0;
 		}
 
 	dm_list_iterate_items(seg, &lv->segments) {
 		if (sigint_caught()) {
-			stack;
+			log_stack;
 			r = 0;
 			break;
 		}
@@ -1964,7 +1964,7 @@ int monitor_dev_for_events(struct cmd_context *cmd, const struct logical_volume 
 				continue;
 			if (!monitor_dev_for_events(cmd, seg_lv(seg, s), NULL,
 						    monitor)) {
-				stack;
+				log_stack;
 				r = 0;
 			}
 		}
@@ -1977,20 +1977,20 @@ int monitor_dev_for_events(struct cmd_context *cmd, const struct logical_volume 
 		if (seg->pool_lv &&
 		    !monitor_dev_for_events(cmd, seg->pool_lv,
 					    (!monitor) ? laopts : NULL, monitor)) {
-			stack;
+			log_stack;
 			r = 0;
 		}
 
 		if (seg->external_lv &&
 		    !monitor_dev_for_events(cmd, seg->external_lv,
 					    (!monitor) ? laopts : NULL, monitor)) {
-			stack;
+			log_stack;
 			r = 0;
 		}
 
 		if (seg->metadata_lv &&
 		    !monitor_dev_for_events(cmd, seg->metadata_lv, NULL, monitor)) {
-			stack;
+			log_stack;
 			r = 0;
 		}
 
@@ -2071,7 +2071,7 @@ int monitor_dev_for_events(struct cmd_context *cmd, const struct logical_volume 
 			 * so they skip this dm mirror table refreshing step.
 			 */
 			if (!_lv_activate_lv(lv, &mirr_laopts)) {
-				stack;
+				log_stack;
 				r = 0;
 			}
 		}
@@ -2081,7 +2081,7 @@ int monitor_dev_for_events(struct cmd_context *cmd, const struct logical_volume 
 		for (i = 0;; i++) {
 			pending = 0;
 			if (!seg->segtype->ops->target_monitored(seg, &pending, &monitored)) {
-				stack;
+				log_stack;
 				r = 0;
 				break;
 			}
@@ -2090,7 +2090,7 @@ int monitor_dev_for_events(struct cmd_context *cmd, const struct logical_volume 
 			log_very_verbose("%s %smonitoring still pending: waiting...",
 					 display_lvname(lv), monitor ? "" : "un");
 			if (interruptible_usleep(10000 * i)) {
-				stack;
+				log_stack;
 				r = 0;
 				break;
 			}
@@ -2266,7 +2266,7 @@ static int _lv_suspend(struct cmd_context *cmd, const char *lvid_s,
 
 	if (!monitor_dev_for_events(cmd, lv, laopts, 0))
 		/* FIXME Consider aborting here */
-		stack;
+		log_stack;
 
 	/* Require fs synchronization when taking a thin snapshot */
 	if (laopts->origin_only && lv_is_thin_volume(lv) && lv_is_thin_volume(lv_pre))
@@ -2456,7 +2456,7 @@ needs_resume:
 	critical_section_dec(cmd, "resumed");
 
 	if (!monitor_dev_for_events(cmd, lv, laopts, 1))
-		stack;
+		log_stack;
 
 	r = 1;
 out:
@@ -2572,7 +2572,7 @@ int lv_deactivate(struct cmd_context *cmd, const char *lvid_s, const struct logi
 	}
 
 	if (!monitor_dev_for_events(cmd, lv, &laopts, 0))
-		stack;
+		log_stack;
 
 	critical_section_inc(cmd, "deactivating");
 	r = _lv_deactivate(lv);
@@ -2718,11 +2718,11 @@ static int _lv_activate(struct cmd_context *cmd, const char *lvid_s,
 
 	critical_section_inc(cmd, "activating");
 	if (!(r = _lv_activate_lv(lv, laopts)))
-		stack;
+		log_stack;
 	critical_section_dec(cmd, "activated");
 
 	if (r && !monitor_dev_for_events(cmd, lv, laopts, 1))
-		stack;
+		log_stack;
 out:
 	return r;
 }

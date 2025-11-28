@@ -380,7 +380,7 @@ static int _mirrored_add_target_line(struct dev_manager *dm, struct dm_pool *mem
 		return_0;
 
 	if ((r = _add_log(mem, seg, laopts, node, area_count, region_size)) <= 0) {
-		stack;
+		log_stack;
 		return r;
 	}
 

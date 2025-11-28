@@ -221,7 +221,7 @@ void pvdisplay_colons(const struct physical_volume *pv)
 		return;
 
 	if (!id_write_format(&pv->id, uuid, sizeof(uuid))) {
-		stack;
+		log_stack;
 		return;
 	}
 
@@ -278,7 +278,7 @@ void pvdisplay_full(const struct cmd_context *cmd,
 		return;
 
 	if (!id_write_format(&pv->id, uuid, sizeof(uuid))) {
-		stack;
+		log_stack;
 		return;
 	}
 
@@ -817,7 +817,7 @@ void vgdisplay_full(const struct volume_group *vg)
 		  display_size(vg->cmd, vg_free(vg)));
 
 	if (!id_write_format(&vg->id, uuid, sizeof(uuid))) {
-		stack;
+		log_stack;
 		return;
 	}
 
@@ -848,7 +848,7 @@ void vgdisplay_colons(const struct volume_group *vg)
 	}
 
 	if (!id_write_format(&vg->id, uuid, sizeof(uuid))) {
-		stack;
+		log_stack;
 		return;
 	}
 
@@ -1036,7 +1036,7 @@ char yes_no_prompt(const char *prompt, ...)
 
 	/* For other then Yes answer check there is really no interrupt */
 	if (sig || sigint_caught()) {
-		stack;
+		log_stack;
 		ret = 'n';
 	} else if (c == EOF) {
 		fputs("[n]\n", stderr);

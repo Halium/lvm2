@@ -187,7 +187,7 @@ int lvrename(struct cmd_context *cmd, int argc, char **argv)
 	}
 
 	if (!apply_lvname_restrictions(lv_name_new)) {
-		stack;
+		log_stack;
 		return EINVALID_CMD_LINE;
 	}
 

@@ -578,7 +578,7 @@ static void _warn_unused_duplicates(struct cmd_context *cmd)
 	dm_list_iterate_items(devl, &_unused_duplicates) {
 		memcpy(&id, devl->dev->pvid, ID_LEN);
 		if (!id_write_format(&id, pvid_dashed, sizeof(pvid_dashed)))
-			stack;
+			log_stack;
 
 		log_warn("WARNING: Not using device %s for PV %s.", dev_name(devl->dev), pvid_dashed);
 	}
@@ -590,7 +590,7 @@ static void _warn_unused_duplicates(struct cmd_context *cmd)
 
 		memcpy(&id, info->dev->pvid, ID_LEN);
 		if (!id_write_format(&id, pvid_dashed, sizeof(pvid_dashed)))
-			stack;
+			log_stack;
 
 		log_warn("WARNING: PV %s prefers device %s because %s.",
 			 pvid_dashed, dev_name(info->dev), info->dev->duplicate_prefer_reason);
@@ -1849,7 +1849,7 @@ static int _lvmcache_update_vgname(struct cmd_context *cmd,
 		return 1;
 
 	if (!id_write_format((const struct id *)vgid, vgid_dashed, sizeof(vgid_dashed)))
-		stack;
+		log_stack;
 
 	/*
 	 * Add vginfo for orphan VG
@@ -1945,7 +1945,7 @@ static int _lvmcache_update_vgname(struct cmd_context *cmd,
 
 			if (vginfo_is_allowed && other_is_allowed) {
 				if (!id_write_format((const struct id *)other->vgid, other_dashed, sizeof(other_dashed)))
-					stack;
+					log_stack;
 
 				vginfo->has_duplicate_local_vgname = 1;
 				other->has_duplicate_local_vgname = 1;
@@ -2652,11 +2652,11 @@ void lvmcache_destroy(struct cmd_context *cmd, int retain_orphans, int reset)
 		struct format_type *fmt;
 
 		if (!lvmcache_init(cmd))
-			stack;
+			log_stack;
 
 		dm_list_iterate_items(fmt, &cmd->formats) {
 			if (!lvmcache_add_orphan_vginfo(cmd, fmt->orphan_vg_name, fmt))
-				stack;
+				log_stack;
 		}
 	}
 }

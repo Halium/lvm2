@@ -348,7 +348,7 @@ int process_each_segment_in_pv(struct cmd_context *cmd,
 	if (dm_list_empty(&pv->segments)) {
 		ret = process_single_pvseg(cmd, NULL, &_free_pv_segment, handle);
 		if (ret != ECMD_PROCESSED)
-			stack;
+			log_stack;
 		if (ret > ret_max)
 			ret_max = ret;
 	} else {
@@ -359,7 +359,7 @@ int process_each_segment_in_pv(struct cmd_context *cmd,
 			ret = process_single_pvseg(cmd, vg, pvseg, handle);
 			_update_selection_result(handle, &whole_selected);
 			if (ret != ECMD_PROCESSED)
-				stack;
+				log_stack;
 			if (ret > ret_max)
 				ret_max = ret;
 		}
@@ -387,7 +387,7 @@ int process_each_segment_in_lv(struct cmd_context *cmd,
 		ret = process_single_seg(cmd, seg, handle);
 		_update_selection_result(handle, &whole_selected);
 		if (ret != ECMD_PROCESSED)
-			stack;
+			log_stack;
 		if (ret > ret_max)
 			ret_max = ret;
 	}
@@ -895,7 +895,7 @@ int vg_refresh_visible(struct cmd_context *cmd, struct volume_group *vg)
 	dm_list_iterate_items(lvl, &vg->lvs) {
 		if (sigint_caught()) {
 			r = 0;
-			stack;
+			log_stack;
 			break;
 		}
 
@@ -903,7 +903,7 @@ int vg_refresh_visible(struct cmd_context *cmd, struct volume_group *vg)
 		    !(lv_is_cow(lvl->lv) && !lv_is_virtual_origin(origin_from_cow(lvl->lv))) &&
 		    !lv_refresh(cmd, lvl->lv)) {
 			r = 0;
-			stack;
+			log_stack;
 		}
 	}
 
@@ -2334,14 +2334,14 @@ static int _process_vgnameid_list(struct cmd_context *cmd, uint32_t read_flags,
 			log_set_report_object_name_and_id(vg_name + sizeof(VG_ORPHANS), NULL);
 		} else {
 			if (vg_uuid && !id_write_format((const struct id*)vg_uuid, uuid, sizeof(uuid)))
-				stack;
+				log_stack;
 			log_set_report_object_name_and_id(vg_name, (const struct id*)vg_uuid);
 		}
 
 		log_very_verbose("Processing VG %s %s", vg_name, uuid);
 do_lockd:
 		if (is_lockd && !lockd_vg(cmd, vg_name, NULL, 0, &lockd_state)) {
-			stack;
+			log_stack;
 			ret_max = ECMD_FAILED;
 			report_log_ret_code(ret_max);
 			continue;
@@ -2349,7 +2349,7 @@ do_lockd:
 
 		vg = vg_read(cmd, vg_name, vg_uuid, read_flags, lockd_state, &error_flags, &error_vg);
 		if (_ignore_vg(cmd, error_flags, error_vg, vg_name, arg_vgnames, read_flags, &skip, &notfound)) {
-			stack;
+			log_stack;
 			ret_max = ECMD_FAILED;
 			report_log_ret_code(ret_max);
 			if (error_vg)
@@ -2381,7 +2381,7 @@ do_lockd:
 			ret = process_single_vg(cmd, vg_name, vg, handle);
 			_update_selection_result(handle, &whole_selected);
 			if (ret != ECMD_PROCESSED)
-				stack;
+				log_stack;
 			report_log_ret_code(ret);
 			if (ret > ret_max)
 				ret_max = ret;
@@ -2391,7 +2391,7 @@ do_lockd:
 endvg:
 		release_vg(vg);
 		if (is_lockd && !lockd_vg(cmd, vg_name, "un", 0, &lockd_state))
-			stack;
+			log_stack;
 
 		log_set_report_object_name_and_id(NULL, NULL);
 	}
@@ -2450,7 +2450,7 @@ static int _resolve_duplicate_vgnames(struct cmd_context *cmd,
 			 */
 			if (lvmcache_vg_is_foreign(cmd, vgnl->vg_name, vgnl->vgid)) {
 				if (!id_write_format((const struct id*)vgnl->vgid, uuid, sizeof(uuid)))
-					stack;
+					log_stack;
 				dm_list_del(&vgnl->list);
 			} else {
 				found++;
@@ -3590,7 +3590,7 @@ int process_each_lv_in_vg(struct cmd_context *cmd, struct volume_group *vg,
 		if (handle_supplied)
 			_update_selection_result(handle, &whole_selected);
 		if (ret != ECMD_PROCESSED)
-			stack;
+			log_stack;
 		report_log_ret_code(ret);
 		if (ret > ret_max)
 			ret_max = ret;
@@ -3643,7 +3643,7 @@ int process_each_lv_in_vg(struct cmd_context *cmd, struct volume_group *vg,
 			if (handle_supplied)
 				_update_selection_result(handle, &whole_selected);
 			if (ret != ECMD_PROCESSED)
-				stack;
+				log_stack;
 			report_log_ret_code(ret);
 			if (ret > ret_max)
 				ret_max = ret;
@@ -3783,7 +3783,7 @@ static int _get_arg_lvnames(struct cmd_context *cmd,
 				lv_name++;
 			if (!(vgname = extract_vgname(cmd, vgname))) {
 				if (ret_max < ECMD_FAILED) {
-					stack;
+					log_stack;
 					ret_max = ECMD_FAILED;
 				}
 				continue;
@@ -4007,7 +4007,7 @@ static int _process_lv_vgnameid_list(struct cmd_context *cmd, uint32_t read_flag
 
 		uuid[0] = '\0';
 		if (vg_uuid && !id_write_format((const struct id*)vg_uuid, uuid, sizeof(uuid)))
-			stack;
+			log_stack;
 
 		log_set_report_object_name_and_id(vg_name, (const struct id*)vg_uuid);
 
@@ -4053,7 +4053,7 @@ do_lockd:
 
 		vg = vg_read(cmd, vg_name, vg_uuid, read_flags, lockd_state, &error_flags, &error_vg);
 		if (_ignore_vg(cmd, error_flags, error_vg, vg_name, arg_vgnames, read_flags, &skip, &notfound)) {
-			stack;
+			log_stack;
 			ret_max = ECMD_FAILED;
 			report_log_ret_code(ret_max);
 			if (error_vg)
@@ -4077,7 +4077,7 @@ do_lockd:
 		ret = process_each_lv_in_vg(cmd, vg, &lvnames, tags_arg, 0,
 					    handle, check_single_lv, process_single_lv);
 		if (ret != ECMD_PROCESSED)
-			stack;
+			log_stack;
 		report_log_ret_code(ret);
 		if (ret > ret_max)
 			ret_max = ret;
@@ -4086,7 +4086,7 @@ do_lockd:
 endvg:
 		release_vg(vg);
 		if (is_lockd && !lockd_vg(cmd, vg_name, "un", 0, &lockd_state))
-			stack;
+			log_stack;
 		log_set_report_object_name_and_id(NULL, NULL);
 	}
 	do_report_ret_code = 0;
@@ -4502,7 +4502,7 @@ static int _process_pvs_in_vg(struct cmd_context *cmd,
 
 	vg_uuid[0] = '\0';
 	if (!id_write_format(&vg->id, vg_uuid, sizeof(vg_uuid)))
-		stack;
+		log_stack;
 
 	if (!handle && (!(handle = init_processing_handle(cmd, NULL)))) {
 		ret_max = ECMD_FAILED;
@@ -4592,7 +4592,7 @@ static int _process_pvs_in_vg(struct cmd_context *cmd,
 			if (!skip) {
 				ret = process_single_pv(cmd, vg, pv, handle);
 				if (ret != ECMD_PROCESSED)
-					stack;
+					log_stack;
 				report_log_ret_code(ret);
 				if (ret > ret_max)
 					ret_max = ret;
@@ -4688,7 +4688,7 @@ do_lockd:
 		vg = vg_read(cmd, vg_name, vg_uuid, read_flags, lockd_state, &error_flags, &error_vg);
 		if (_ignore_vg(cmd, error_flags, error_vg, vg_name, NULL, read_flags, &skip, &notfound) ||
 		    (!vg && !error_vg)) {
-			stack;
+			log_stack;
 			ret_max = ECMD_FAILED;
 			report_log_ret_code(ret_max);
 			if (!skip || (!vg && !error_vg))
@@ -4715,7 +4715,7 @@ do_lockd:
 					 process_all_pvs, skip, error_flags,
 					 handle, process_single_pv);
 		if (ret != ECMD_PROCESSED)
-			stack;
+			log_stack;
 
 		report_log_ret_code(ret);
 
@@ -4729,7 +4729,7 @@ endvg:
 			unlock_and_release_vg(cmd, error_vg, vg_name);
 		release_vg(vg);
 		if (is_lockd && !lockd_vg(cmd, vg_name, "un", 0, &lockd_state))
-			stack;
+			log_stack;
 
 		/* Quit early when possible. */
 		if (!process_all_pvs && dm_list_empty(arg_tags) && dm_list_empty(arg_devices)) {
@@ -4853,7 +4853,7 @@ int process_each_pv(struct cmd_context *cmd,
 				  &arg_devices, &arg_tags, process_all_pvs,
 				  handle, process_single_pv);
 	if (ret != ECMD_PROCESSED)
-		stack;
+		log_stack;
 	if (ret > ret_max)
 		ret_max = ret;
 
@@ -4916,7 +4916,7 @@ int process_each_pv_in_vg(struct cmd_context *cmd, struct volume_group *vg,
 		ret = process_single_pv(cmd, vg, pvl->pv, handle);
 		_update_selection_result(handle, &whole_selected);
 		if (ret != ECMD_PROCESSED)
-			stack;
+			log_stack;
 		report_log_ret_code(ret);
 		if (ret > ret_max)
 			ret_max = ret;
@@ -4953,7 +4953,7 @@ int lvremove_single(struct cmd_context *cmd, struct logical_volume *lv,
 		/* save for removal */
 		if (!str_list_add(cmd->mem, &lp->removed_uuids,
 				  dm_build_dm_uuid(cmd->mem, UUID_PREFIX, lv->lvid.s, NULL)))
-			stack;
+			log_stack;
 
 	return ECMD_PROCESSED;
 }
@@ -6253,7 +6253,7 @@ do_command:
 
 	/* TODO: when vgcreate uses only existing PVs this doesn't change and can be skipped */
 	if (!device_ids_write(cmd))
-		stack;
+		log_stack;
 
 	/*
 	 * Don't keep devs open excl in bcache because the excl will prevent

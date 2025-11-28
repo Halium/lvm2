@@ -470,7 +470,7 @@ int lv_cache_wait_for_clean(struct logical_volume *cache_lv, int *is_clean)
 				/* Restore normal table */
 				sigint_clear();
 				if (!lv_update_and_reload_origin(cache_lv))
-					stack;
+					log_stack;
 			}
 			return 0;
 		}
@@ -625,7 +625,7 @@ int lv_cache_remove(struct logical_volume *cache_lv)
 	 */
 	if (!lv_cache_wait_for_clean(cache_lv, &is_clear)) {
 		if (temp_activated && !deactivate_lv(cache_lv->vg->cmd, cache_lv))
-			stack;
+			log_stack;
 		return_0;
 	}
 

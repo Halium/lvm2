@@ -1980,7 +1980,7 @@ int config_write(struct dm_config_tree *cft,
 	}
 
 	if (free_fp && baton.fp && dm_fclose(baton.fp)) {
-		stack;
+		log_stack;
 		r = 0;
 	}
 
@@ -2536,7 +2536,7 @@ int get_default_allocation_thin_pool_chunk_size_CFG(struct cmd_context *cmd, str
 
 	if (!get_default_allocation_thin_pool_chunk_size(cmd, profile, &chunk_size,
 							 &chunk_size_calc_method)) {
-		stack; /* Ignore this error, never happens... */
+		log_stack; /* Ignore this error, never happens... */
 		chunk_size = DEFAULT_THIN_POOL_CHUNK_SIZE * 2;
 	}
 

@@ -123,12 +123,12 @@ int read_urandom(void *buf, size_t len)
 	if (read(fd, buf, len) != (ssize_t) len) {
 		log_sys_error("read", "read_urandom: /dev/urandom");
 		if (close(fd))
-			stack;
+			log_stack;
 		return 0;
 	}
 
 	if (close(fd))
-		stack;
+		log_stack;
 
 	return 1;
 }

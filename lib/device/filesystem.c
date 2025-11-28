@@ -76,7 +76,7 @@ static int _get_crypt_path(dev_t lv_devt, char *lv_path, char *crypt_path)
 
 		if (dm_snprintf(crypt_path, PATH_MAX, "/dev/%s", holder_name) < 0) {
 			ret = 0;
-			stack;
+			log_stack;
 			break;
 		}
 		ret = 1;
@@ -479,7 +479,7 @@ int fs_mount_state_is_misnamed(struct cmd_context *cmd, struct logical_volume *l
 	}
 
 	if (fclose(fp))
-		stack;
+		log_stack;
 
 	if (renamed) {
 		log_error("File system resizing not supported: fs utilities do not support renamed devices.");

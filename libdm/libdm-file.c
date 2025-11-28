@@ -250,12 +250,12 @@ int dm_daemon_is_running(const char* lockfile)
                log_error("Cannot check lock status of lockfile [%s], error was [%s]",
                          lockfile, strerror(errno));
                if (close(fd))
-                       stack;
+                       log_stack;
                return 0;
        }
 
        if (close(fd))
-               stack;
+               log_stack;
 
        return (lock.l_type == F_UNLCK) ? 0 : 1;
 }

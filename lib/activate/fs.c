@@ -286,10 +286,10 @@ static int _do_fs_op(fs_op_t type, const char *dev_dir, const char *vg_name,
 	case FS_RENAME:
 		if (old_lv_name && !_rm_link(dev_dir, vg_name, old_lv_name,
 					     check_udev))
-			stack;
+			log_stack;
 
 		if (!_mk_link(dev_dir, vg_name, lv_name, dev, check_udev))
-			stack;
+			log_stack;
 	default:
 		; /* NOTREACHED */
 	}
@@ -497,7 +497,7 @@ void fs_unlock(void)
 			log_debug_activation("Syncing device names");
 		/* Wait for all processed udev devices */
 		if (!dm_udev_wait(_fs_cookie))
-			stack;
+			log_stack;
 		_fs_cookie = DM_COOKIE_AUTO_CREATE; /* Reset cookie */
 		dm_lib_release();
 		_pop_fs_ops();

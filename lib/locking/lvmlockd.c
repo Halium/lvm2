@@ -733,12 +733,12 @@ static int _handle_sanlock_lv(struct cmd_context *cmd, struct volume_group *vg)
 	if (ioctl(fd, BLKGETSIZE64, &dm_size_bytes) < 0) {
 		log_error("Cannot get size of sanlock LV %s.", lvmlock_path);
 		if (close(fd))
-			stack;
+			log_stack;
 		return 0;
 	}
 
 	if (close(fd))
-		stack;
+		log_stack;
 
 	/*
 	 * Another host may have extended the lvmlock LV.
@@ -1092,7 +1092,7 @@ out:
 		_deactivate_sanlock_lv(cmd, vg);
 		_remove_sanlock_lv(cmd, vg);
 		if (!vg_write(vg) || !vg_commit(vg))
-			stack;
+			log_stack;
 	}
 
 	daemon_reply_destroy(reply);

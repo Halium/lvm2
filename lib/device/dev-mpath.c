@@ -152,15 +152,15 @@ static void _read_blacklist_file(const char *path)
 
 		if (section_exceptions) {
 			if (!str_list_add(_wwid_mem, &_ignored_exceptions, dm_pool_strdup(_wwid_mem, wwid)))
-				stack;
+				log_stack;
 		} else {
 			if (!str_list_add(_wwid_mem, &_ignored, dm_pool_strdup(_wwid_mem, wwid)))
-				stack;
+				log_stack;
 		}
 	}
 
 	if (fclose(fp))
-		stack;
+		log_stack;
 }
 
 static void _read_wwid_exclusions(void)
@@ -250,7 +250,7 @@ static void _read_wwid_file(const char *config_wwids_file, int *entries)
 	}
 
 	if (fclose(fp))
-		stack;
+		log_stack;
 
 	log_debug("multipath wwids read %d from %s", count, config_wwids_file);
 	*entries = count;
@@ -718,7 +718,7 @@ const char *dev_mpath_component_wwid(struct cmd_context *cmd, struct device *dev
 		}
 
 		if (!get_sysfs_value(wwid_path, sysbuf, sizeof(sysbuf), 0))
-			stack;
+			log_stack;
 
 		if (!sysbuf[0])
 			continue;

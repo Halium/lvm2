@@ -308,7 +308,7 @@ static uint64_t mda2_offset_from_size(struct device *dev, uint64_t mda2_size)
 	uint64_t mda2_offset;
 
 	if (dev_get_size(dev, &dev_sectors))
-		stack;
+		log_stack;
 
 	dev_bytes = dev_sectors * 512;
 	extra_bytes = dev_bytes % ONE_MB_IN_BYTES;
@@ -329,7 +329,7 @@ static uint64_t mda2_size_from_offset(struct device *dev, uint64_t mda2_offset)
 	uint64_t mda2_size;
 
 	if (dev_get_size(dev, &dev_sectors))
-		stack;
+		log_stack;
 
 	dev_bytes = dev_sectors * 512;
 	extra_bytes = dev_bytes % ONE_MB_IN_BYTES;
@@ -640,9 +640,9 @@ static int _dump_all_text(struct cmd_context *cmd, struct settings *set, const c
 
 	if (fp) {
 		if (fflush(fp))
-			stack;
+			log_stack;
 		if (fclose(fp))
-			stack;
+			log_stack;
 	}
 
 	return 1;
@@ -874,9 +874,9 @@ static int _dump_meta_area(struct device *dev, struct devicefile *def, const cha
 	free(meta_buf);
 
 	if (fflush(fp))
-		stack;
+		log_stack;
 	if (fclose(fp))
-		stack;
+		log_stack;
 	return ret;
 }
 
@@ -1001,9 +1001,9 @@ static int _dump_current_text(struct device *dev, struct devicefile *def,
 		fprintf(fp, "%s", meta_buf);
 
 		if (fflush(fp))
-			stack;
+			log_stack;
 		if (fclose(fp))
-			stack;
+			log_stack;
 	}
 
  out:
@@ -1710,7 +1710,7 @@ static int _dump_search(struct cmd_context *cmd, const char *dump, struct settin
 		uint64_t extra_bytes;
 
 		if (dev_get_size(dev, &dev_sectors))
-			stack;
+			log_stack;
 
 		dev_bytes = dev_sectors * 512;
 		extra_bytes = dev_bytes % ONE_MB_IN_BYTES;
@@ -2838,7 +2838,7 @@ static int _dump_backup_to_raw(struct cmd_context *cmd, struct settings *set)
 	}
 
 	if (close(fd))
-		stack;
+		log_stack;
 
 	if (!_is_backup_file(cmd, back_buf, back_size)) {
 		log_error("File does not appear to contain a metadata backup.");
@@ -2866,9 +2866,9 @@ static int _dump_backup_to_raw(struct cmd_context *cmd, struct settings *set)
 		fprintf(fp, "%s", text_buf);
 
 		if (fflush(fp))
-			stack;
+			log_stack;
 		if (fclose(fp))
-			stack;
+			log_stack;
 	}
 	ret = 1;
 out:
@@ -2878,7 +2878,7 @@ out:
 
 fail_close:
 	if (close(fd))
-		stack;
+		log_stack;
 	return 0;
 }
 
@@ -2976,7 +2976,7 @@ static int _read_metadata_file(struct cmd_context *cmd, struct metadata_file *mf
 	text_buf[text_size++] = 0; /* null terminating byte */
 
 	if (close(fd))
-		stack;
+		log_stack;
 
 	if (_is_backup_file(cmd, text_buf, text_size)) {
 		char *back_buf = text_buf;
@@ -3004,7 +3004,7 @@ static int _read_metadata_file(struct cmd_context *cmd, struct metadata_file *mf
 
 out:
 	if (close(fd))
-		stack;
+		log_stack;
 	return 0;
 }
 

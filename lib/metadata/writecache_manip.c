@@ -158,12 +158,12 @@ static void _rename_detached_cvol(struct cmd_context *cmd, struct logical_volume
 	}
 
 	if (!(cvol_name_dup = dm_pool_strdup(vg->vgmem, cvol_name))) {
-		stack;
+		log_stack;
 		return;
 	}
 
 	if (!lv_set_name(lv_fast, cvol_name_dup))
-		stack;
+		log_stack;
 }
 
 static int _lv_detach_writecache_cachevol_inactive(struct logical_volume *lv, int noflush)

@@ -2016,7 +2016,7 @@ void dev_set_last_byte(struct device *dev, uint64_t offset)
 	unsigned int bs;
 
 	if (!dev_get_direct_block_sizes(dev, &physical_block_size, &logical_block_size)) {
-		stack;
+		log_stack;
 		return; /* FIXME: error path ? */
 	}
 

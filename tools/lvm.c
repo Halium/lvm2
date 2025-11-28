@@ -357,7 +357,7 @@ report_log:
 
 	if (cmd->cmd_report.report_group) {
 		if (!dm_report_group_destroy(cmd->cmd_report.report_group))
-			stack;
+			log_stack;
 		cmd->cmd_report.report_group = NULL;
 	}
 

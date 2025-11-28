@@ -722,7 +722,7 @@ int init_multiple_segtypes(struct cmd_context *cmd, struct segtype_library *segl
 		if ((segtype = _init_raid_segtype(cmd, &_raid_types[i], dso, monitored)) &&
 		    !lvm_register_segtype(seglib, segtype)) {
 			/* segtype is already destroyed */
-			stack;
+			log_stack;
 			r = 0;
 			break;
 		}

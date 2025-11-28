@@ -185,7 +185,7 @@ void process_event(struct dm_task *dmt,
 		if (_use_policy(dmt, state))
 			goto out;
 
-		stack;
+		log_stack;
 
 		/*
 		 * Rather update oldish status

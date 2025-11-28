@@ -379,7 +379,7 @@ int daemon_talk(struct dm_event_fifos *fifos,
 	 * read status return code from daemon.
 	 */
 	if (!_daemon_write(fifos, msg)) {
-		stack;
+		log_stack;
 		free(msg->data);
 		msg->data = NULL;
 		return -EIO;
@@ -390,7 +390,7 @@ int daemon_talk(struct dm_event_fifos *fifos,
 		msg->data = NULL;
 
 		if (!_daemon_read(fifos, msg)) {
-			stack;
+			log_stack;
 			return -EIO;
 		}
 	} while (!_check_message_id(msg));

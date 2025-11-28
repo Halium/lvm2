@@ -24,7 +24,7 @@ static int _vgmknodes_single(struct cmd_context *cmd, struct logical_volume *lv,
 			return_ECMD_FAILED;
 		}
 		if (!sync_local_dev_names(cmd))
-			stack;
+			log_stack;
 	}
 
 	if (!lv_mknodes(cmd, lv))

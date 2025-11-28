@@ -152,9 +152,9 @@ static void _searched_devnames_create(struct cmd_context *cmd,
 		  search_pvids_count, search_pvids_hash, search_devs_count, search_devs_hash);
 out:
 	if (fsync(dir_fd) < 0)
-		stack;
+		log_stack;
 	if (close(dir_fd) < 0)
-		stack;
+		log_stack;
 }
 
 void unlink_searched_devnames(struct cmd_context *cmd)
@@ -1388,7 +1388,7 @@ int device_ids_read(struct cmd_context *cmd)
 		dm_list_add(&cmd->use_devices, &du->list);
 	}
 	if (fclose(fp))
-		stack;
+		log_stack;
 
 	log_debug("Devices file comment hash %u calc hash %u", comment_hash, hash);
 
@@ -1457,11 +1457,11 @@ static void devices_file_backup(struct cmd_context *cmd, char *fc, char *fb, tim
 	if (!(backup_limit = (unsigned int)find_config_tree_int(cmd, devices_devicesfile_backup_limit_CFG, NULL)))
 		return;
 	if (dm_snprintf(dirpath, sizeof(dirpath), "%s/devices/backup/", cmd->system_dir) < 0) {
-		stack;
+		log_stack;
 		return;
 	}
 	if (!dm_create_dir(dirpath)) {
-		stack;
+		log_stack;
 		return;
 	}
 	tm = localtime(tp);
@@ -1504,7 +1504,7 @@ static void devices_file_backup(struct cmd_context *cmd, char *fc, char *fb, tim
 		goto out;
 	}
 	if (fclose(fp))
-		stack;
+		log_stack;
 	fp = NULL;
 	log_debug("Wrote backup %s", path);
 
@@ -1610,7 +1610,7 @@ static void devices_file_backup(struct cmd_context *cmd, char *fc, char *fb, tim
 
 out:
 	if (fp && fclose(fp))
-		stack;
+		log_stack;
 
 	if (dir && closedir(dir))
 		log_sys_debug("closedir", dirpath);
@@ -1832,9 +1832,9 @@ int device_ids_write(struct cmd_context *cmd)
 	}
 
 	if (fsync(dir_fd) < 0)
-		stack;
+		log_stack;
 	if (close(dir_fd) < 0)
-		stack;
+		log_stack;
 	dir_fd = -1;
 
 	ret = 1;
@@ -1880,7 +1880,7 @@ static void _device_ids_update_try(struct cmd_context *cmd)
 	} else {
 		if (device_ids_version_unchanged(cmd)) {
 			if (!device_ids_write(cmd))
-				stack;
+				log_stack;
 		} else
 			log_debug("Skip devices file update (changed).");
 	}
@@ -1905,7 +1905,7 @@ int device_ids_version_unchanged(struct cmd_context *cmd)
 
 		if (!strncmp(line, "VERSION", 7)) {
 			if (fclose(fp))
-				stack;
+				log_stack;
 
 			_copy_idline_str(line, version_buf, sizeof(version_buf));
 
@@ -1918,7 +1918,7 @@ int device_ids_version_unchanged(struct cmd_context *cmd)
 	}
 
 	if (fclose(fp))
-		stack;
+		log_stack;
 	return 0;
 }
 
@@ -2425,7 +2425,7 @@ void device_id_update_vg_uuid(struct cmd_context *cmd, struct volume_group *vg, 
 
 	if (update &&
 	    !device_ids_write(cmd))
-		stack;
+		log_stack;
 	unlock_devices_file(cmd);
 }
 
@@ -3153,7 +3153,7 @@ void device_ids_validate(struct cmd_context *cmd, struct dm_list *scanned_devs, 
 				  dev_name(dev), dev->pvid);
 			log_debug("suspect device id serial %s for %s", du->idname, dev_name(dev));
 			if (!str_list_add(cmd->mem, &cmd->device_ids_check_serial, dm_pool_strdup(cmd->mem, du->idname)))
-				stack;
+				log_stack;
 			cmd->device_ids_invalid = 1;
 			continue;
 		}
@@ -3320,7 +3320,7 @@ void device_ids_validate(struct cmd_context *cmd, struct dm_list *scanned_devs, 
 				free(dup_devname2);
 				free(dup_devname3);
 				free(id);
-				stack;
+				log_stack;
 				continue;
 			}
 
@@ -4136,7 +4136,7 @@ void device_ids_search(struct cmd_context *cmd, struct dm_list *new_devs,
 			free(new_idname);
 			free(new_idname2);
 			free(new_devname);
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -4256,7 +4256,7 @@ int devices_file_touch(struct cmd_context *cmd)
 		return 0;
 	}
 	if (close(fd))
-		stack;
+		log_stack;
 	return 1;
 }
 
@@ -4373,7 +4373,7 @@ static int _lock_devices_file(struct cmd_context *cmd, int mode, int nonblock, i
 	log_debug("lock_devices_file flock errno %d", errno);
 
 	if (close(fd))
-		stack;
+		log_stack;
 	if (cmd->sysinit || cmd->ignorelockingfailure)
 		return 1;
 	return 0;
@@ -4415,7 +4415,7 @@ void unlock_devices_file(struct cmd_context *cmd)
 	_devices_file_locked = 0;
 
 	if (close(_devices_fd))
-		stack;
+		log_stack;
 	_devices_fd = -1;
 }
 

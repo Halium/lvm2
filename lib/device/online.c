@@ -459,11 +459,11 @@ bad:
 void online_dir_setup(struct cmd_context *cmd)
 {
 	if (!dir_create_recursive(PVS_ONLINE_DIR, 0755))
-		stack;
+		log_stack;
 	if (!dir_create_recursive(VGS_ONLINE_DIR, 0755))
-		stack;
+		log_stack;
 	if (!dir_create_recursive(PVS_LOOKUP_DIR, 0755))
-		stack;
+		log_stack;
 }
 
 void online_lookup_file_remove(const char *vgname)

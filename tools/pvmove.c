@@ -526,7 +526,7 @@ static int _activate_lv(struct cmd_context *cmd, struct logical_volume *lv_mirr,
 	r = activate_lv(cmd, lv_mirr);
 
 	if (!r)
-		stack;
+		log_stack;
 
 	return r;
 }
@@ -905,12 +905,12 @@ int pvmove(struct cmd_context *cmd, int argc, char **argv)
 
 		if (!is_abort) {
 			if (!pp.found_pv) {
-				stack;
+				log_stack;
 				return EINVALID_CMD_LINE;
 			}
 
 			if (pp.setup_result != ECMD_PROCESSED) {
-				stack;
+				log_stack;
 				return pp.setup_result;
 			}
 		} else {

@@ -3252,7 +3252,7 @@ int lvm_run_command(struct cmd_context *cmd, int argc, char **argv)
 
 	if ((ret = _process_common_commands(cmd))) {
 		if (ret != ECMD_PROCESSED)
-			stack;
+			log_stack;
 		goto out;
 	}
 
@@ -3344,10 +3344,10 @@ int lvm_run_command(struct cmd_context *cmd, int argc, char **argv)
 	if (config_string_cft) {
 		/* Move this? */
 		if (!refresh_toolcontext(cmd))
-			stack;
+			log_stack;
 	} else if (config_profile_command_cft || config_profile_metadata_cft) {
 		if (!process_profilable_config(cmd))
-			stack;
+			log_stack;
 	}
 
 	if (ret == EINVALID_CMD_LINE && !cmd->is_interactive)

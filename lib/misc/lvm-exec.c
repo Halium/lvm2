@@ -176,7 +176,7 @@ FILE *pipe_open(struct cmd_context *cmd, const char *const argv[],
 	if (pdata->pid == 0) {
 		/* Child -> writer, convert pipe[0] to STDOUT */
 		if (!_reopen_fd_to_null(STDIN_FILENO))
-			stack;
+			log_stack;
 		else if (close(pipefd[0 /*read*/]))
 			log_sys_error("close", "pipe[0]");
 		else if (close(STDOUT_FILENO))

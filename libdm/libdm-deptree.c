@@ -608,7 +608,7 @@ static const char *_node_name(struct dm_tree_node *dnode)
 			"%s (" FMTu32 ":" FMTu32 ")",
 			dnode->name ? dnode->name : "",
 			dnode->info.major, dnode->info.minor) < 0) {
-		stack;
+		log_stack;
 		return dnode->name;
 	}
 
@@ -734,7 +734,7 @@ static int _children_suspended(struct dm_tree_node *node,
 
 	dm_list_iterate_items(dlink, list) {
 		if (!(uuid = dm_tree_node_get_uuid(dlink->node))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -953,7 +953,7 @@ static int _node_has_closed_parents(struct dm_tree_node *node,
 	/* Iterate through parents of this node */
 	dm_list_iterate_items(dlink, &node->used_by) {
 		if (!(uuid = dm_tree_node_get_uuid(dlink->node))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -1216,7 +1216,7 @@ static struct dm_tree_node *_add_dev(struct dm_tree *dtree,
 	/* Can't recurse if not a mapped device or there are no dependencies */
 	if (!node->info.exists || !deps || !deps->count) {
 		if (!_add_to_bottomlevel(node)) {
-			stack;
+			log_stack;
 			node = NULL;
 		}
 		goto out;
@@ -1330,7 +1330,7 @@ static int _resume_node(const char *name, uint32_t major, uint32_t minor,
 		dec_suspended();
 
 	if (!(r = dm_task_get_info(dmt, newinfo)))
-		stack;
+		log_stack;
 
 out:
 	dm_task_destroy(dmt);
@@ -1644,17 +1644,17 @@ static int _dm_tree_deactivate_children(struct dm_tree_node *dnode,
 
 	while ((child = dm_tree_next_child(&handle, dnode, 0))) {
 		if (!(dinfo = dm_tree_node_get_info(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
 		if (!(name = dm_tree_node_get_name(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
 		if (!(uuid = dm_tree_node_get_uuid(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -1684,7 +1684,7 @@ static int _dm_tree_deactivate_children(struct dm_tree_node *dnode,
 
 			/* Check toplevel node for holders/mounted fs */
 			if (!_check_device_not_in_use(name, &info)) {
-				stack;
+				log_stack;
 				r = 0;
 				continue;
 			}
@@ -1724,7 +1724,7 @@ static int _dm_tree_deactivate_children(struct dm_tree_node *dnode,
 		if (child->callback &&
 		    !child->callback(child, DM_NODE_CALLBACK_DEACTIVATED,
 				     child->callback_data))
-			stack;
+			log_stack;
 			/* FIXME Deactivation must currently ignore failure
 			 * here so that lvremove can continue: we need an
 			 * alternative way to handle this state without 
@@ -1761,17 +1761,17 @@ int dm_tree_suspend_children(struct dm_tree_node *dnode,
 	/* Suspend nodes at this level of the tree */
 	while ((child = dm_tree_next_child(&handle, dnode, 0))) {
 		if (!(dinfo = dm_tree_node_get_info(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
 		if (!(name = dm_tree_node_get_name(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
 		if (!(uuid = dm_tree_node_get_uuid(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -1792,7 +1792,7 @@ int dm_tree_suspend_children(struct dm_tree_node *dnode,
 		/* If child has some real messages send them */
 		if ((child->props.send_messages > 1) && r) {
 			if (!(r = _node_send_messages(child, uuid_prefix, uuid_prefix_len, 1)))
-				stack;
+				log_stack;
 			else {
 				log_debug_activation("Sent messages to thin-pool %s and "
 						     "skipping suspend of its children.",
@@ -1823,7 +1823,7 @@ int dm_tree_suspend_children(struct dm_tree_node *dnode,
 			continue;
 
 		if (!(uuid = dm_tree_node_get_uuid(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -1871,7 +1871,7 @@ static int _rename_conflict_exists(struct dm_tree_node *parent,
 			continue;
 
 		if (!(sibling_name = dm_tree_node_get_name(sibling))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -1903,7 +1903,7 @@ static int _reactivate_siblings(struct dm_tree_node *dnode,
 
 	/* Wait for udev before reactivating siblings */
 	if (!dm_udev_wait(dm_tree_get_cookie(dnode)))
-		stack;
+		log_stack;
 
 	dm_tree_set_cookie(dnode, 0);
 
@@ -1915,7 +1915,7 @@ static int _reactivate_siblings(struct dm_tree_node *dnode,
 		}
 
 		if (!(uuid = dm_tree_node_get_uuid(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -1962,7 +1962,7 @@ int dm_tree_activate_children(struct dm_tree_node *dnode,
 	/* Activate children first */
 	while ((child = dm_tree_next_child(&handle, dnode, 0))) {
 		if (!(uuid = dm_tree_node_get_uuid(child))) {
-			stack;
+			log_stack;
 			continue;
 		}
 
@@ -1983,7 +1983,7 @@ int dm_tree_activate_children(struct dm_tree_node *dnode,
 				continue;
 
 			if (!(uuid = dm_tree_node_get_uuid(child))) {
-				stack;
+				log_stack;
 				continue;
 			}
 
@@ -1991,7 +1991,7 @@ int dm_tree_activate_children(struct dm_tree_node *dnode,
 				continue;
 
 			if (!(name = dm_tree_node_get_name(child))) {
-				stack;
+				log_stack;
 				continue;
 			}
 
@@ -2034,12 +2034,12 @@ int dm_tree_activate_children(struct dm_tree_node *dnode,
 			 */
 			if (r && (child->props.send_messages > 1) &&
 			    !(r = _node_send_messages(child, uuid_prefix, uuid_prefix_len, 1)))
-				stack;
+				log_stack;
 
 			/* Reactivate only for fresh activated origin */
 			if (r && child->props.reactivate_siblings &&
 			    (!(r = _reactivate_siblings(dnode, uuid_prefix, uuid_prefix_len))))
-				stack;
+				log_stack;
 		}
 		if (awaiting_peer_rename)
 			priority--; /* redo priority level */
@@ -2123,7 +2123,7 @@ static int _build_dev_string(char *devbuf, size_t bufsize, struct dm_tree_node *
 do {\
 	int w;\
 	if ((w = dm_snprintf(params + p, paramsize - (size_t) p, str)) < 0) {\
-		stack; /* Out of space */\
+		log_stack; /* Out of space */\
 		return -1;\
 	}\
 	p += w;\
@@ -2760,7 +2760,7 @@ static int _emit_segment(struct dm_task *dmt, uint32_t major, uint32_t minor,
 		dm_free(params);
 
 		if (!ret)
-			stack;
+			log_stack;
 
 		if (ret >= 0)
 			return ret;
@@ -2888,7 +2888,7 @@ static int _dm_tree_revert_activated(struct dm_tree_node *dnode)
 static int _dm_tree_wait_and_revert_activated(struct dm_tree_node *dnode)
 {
 	if (!dm_udev_wait(dm_tree_get_cookie(dnode)))
-		stack;
+		log_stack;
 
 	dm_tree_set_cookie(dnode, 0);
 
@@ -2930,13 +2930,13 @@ int dm_tree_preload_children(struct dm_tree_node *dnode,
 		if (!child->info.inactive_table &&
 		    child->props.segment_count &&
 		    !_load_node(child)) {
-			stack;
+			log_stack;
 			/*
 			 * If the table load fails, try to device in the kernel
 			 * together with other created and preloaded devices.
 			 */
 			if (!_dm_tree_wait_and_revert_activated(dnode))
-				stack;
+				log_stack;
 			r = 0;
 			continue;
 		}
@@ -2954,7 +2954,7 @@ int dm_tree_preload_children(struct dm_tree_node *dnode,
 				  child->info.suspended)) {
 			log_error("Unable to resume %s.", _node_name(child));
 			if (!_dm_tree_wait_and_revert_activated(dnode))
-				stack;
+				log_stack;
 			r = 0;
 			continue;
 		}
@@ -2963,9 +2963,9 @@ int dm_tree_preload_children(struct dm_tree_node *dnode,
 			/* When creating new node also check transaction_id. */
 			if (child->props.send_messages &&
 			    !_node_send_messages(child, uuid_prefix, uuid_prefix_len, 0)) {
-				stack;
+				log_stack;
 				if (!_dm_tree_wait_and_revert_activated(dnode))
-					stack;
+					log_stack;
 				r = 0;
 				continue;
 			}
@@ -2983,7 +2983,7 @@ int dm_tree_preload_children(struct dm_tree_node *dnode,
 	if (update_devs_flag ||
 	    (r && !dnode->info.exists && dnode->callback)) {
 		if (!dm_udev_wait(dm_tree_get_cookie(dnode)))
-			stack;
+			log_stack;
 		dm_tree_set_cookie(dnode, 0);
 
 		if (r && !dnode->info.exists && dnode->callback &&

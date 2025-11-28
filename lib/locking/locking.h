@@ -58,11 +58,11 @@ int lock_vol(struct cmd_context *cmd, const char *vol, uint32_t flags, const str
 	do { \
 		if (is_real_vg(vol)) { \
 			if (!sync_local_dev_names(cmd)) \
-				stack; \
+				log_stack; \
 			vg_backup_if_needed(vg); \
 		} \
 		if (!lock_vol(cmd, vol, LCK_VG_UNLOCK, NULL)) \
-			stack;	\
+			log_stack;	\
 	} while (0)
 #define unlock_and_release_vg(cmd, vg, vol) \
 	do { \

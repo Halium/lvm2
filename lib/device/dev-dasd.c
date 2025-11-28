@@ -96,7 +96,7 @@ int dasd_is_cdl_formatted(struct device *dev)
 
 out:
 	if (!dev_close(dev))
-		stack;
+		log_stack;
 
 	return ret;
 }

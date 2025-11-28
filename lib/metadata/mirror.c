@@ -835,13 +835,13 @@ static int _split_mirror_images(struct logical_volume *lv,
 			return_0;
 
 		if (!sync_local_dev_names(lv->vg->cmd))
-			stack;
+			log_stack;
 
 		if (!deactivate_lv(lv->vg->cmd, new_lv))
 			return_0;
 
 		if (!sync_local_dev_names(lv->vg->cmd))
-			stack;
+			log_stack;
 
 		if (!_activate_lv_like_model(lv, new_lv)) {
 			log_error("Failed to rename newly split LV in the kernel");
@@ -1089,7 +1089,7 @@ static int _remove_mirror_images(struct logical_volume *lv,
 			return_0;
 
 		if (!sync_local_dev_names(lv->vg->cmd))
-			stack;
+			log_stack;
 	}
 
 	if (!collapse) {
@@ -1943,7 +1943,7 @@ int add_mirror_images(struct cmd_context *cmd, struct logical_volume *lv,
 					  (region_size > lv->vg->extent_size) ?
 					  lv->vg->extent_size : region_size,
 					  alloc, mirror_in_sync() ? 1 : 0))) {
-		stack;
+		log_stack;
 		goto out_remove_images;
 	}
 
@@ -1955,7 +1955,7 @@ int add_mirror_images(struct cmd_context *cmd, struct logical_volume *lv,
 		goto out_remove_log;
 
 	if (log_count && !attach_mirror_log(first_seg(lv), log_lv))
-		stack;
+		log_stack;
 
 	alloc_destroy(ah);
 	return 1;

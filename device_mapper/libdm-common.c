@@ -1819,7 +1819,7 @@ int dm_mountinfo_read(dm_mountinfo_line_callback_fn read_fn, void *cb_data)
 		if (!_sanitize_line(buffer) ||
 		    !_mountinfo_parse_line(buffer, &maj, &min, target) ||
 		    !read_fn(buffer, maj, min, target, cb_data)) {
-			stack;
+			log_stack;
 			r = 0;
 			break;
 		}
@@ -2060,7 +2060,7 @@ int dm_device_get_name(uint32_t major, uint32_t minor, int prefer_kernel_name,
 		if (_sysfs_get_dm_name(major, minor, buf, buf_size))
 			return 1;
 		else
-			stack;
+			log_stack;
 	}
 
 	/*
@@ -2154,7 +2154,7 @@ static int _device_has_mounted_fs(char *buffer, unsigned major, unsigned minor,
 	if ((major == data->maj) && (minor == data->min)) {
 		if (!dm_device_get_name(major, minor, 1, kernel_dev_name,
 					sizeof(kernel_dev_name))) {
-			stack;
+			log_stack;
 			*kernel_dev_name = '\0';
 		}
 		log_verbose("Device %s (%u:%u) appears to be mounted on %s.",
@@ -2174,7 +2174,7 @@ int dm_device_has_mounted_fs(uint32_t major, uint32_t minor)
 	};
 
 	if (!dm_mountinfo_read(_device_has_mounted_fs, &data))
-		stack;
+		log_stack;
 
 	if (data.mounted)
 		return 1;
@@ -2579,7 +2579,7 @@ static int _udev_notify_sem_create(uint32_t *cookie, int *semid)
 			     gen_cookie, gen_semid, val);
 
 	if (close(fd))
-		stack;
+		log_stack;
 
 	*semid = gen_semid;
 	*cookie = gen_cookie;
@@ -2588,7 +2588,7 @@ static int _udev_notify_sem_create(uint32_t *cookie, int *semid)
 
 bad:
 	if (close(fd))
-		stack;
+		log_stack;
 
 	*cookie = 0;
 

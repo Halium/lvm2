@@ -190,7 +190,7 @@ progress_t poll_thin_merge_progress(struct cmd_context *cmd,
 		return PROGRESS_FINISHED_ALL; /* Already merged by someone else */
 
 	if (!lv_thin_device_id(lv, &device_id)) {
-		stack;
+		log_stack;
 		return PROGRESS_CHECK_FAILED;
 	}
 

@@ -105,7 +105,7 @@ static int _text_write(struct label *label, void *buf)
 	memcpy(pvhdr->pv_uuid, &lvmcache_device(info)->pvid, sizeof(struct id));
 	if (!id_write_format((const struct id *)pvhdr->pv_uuid, buffer,
 			     sizeof(buffer))) {
-		stack;
+		log_stack;
 		buffer[0] = '\0';
 	}
 

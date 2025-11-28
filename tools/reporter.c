@@ -1214,7 +1214,7 @@ static int _do_report(struct cmd_context *cmd, struct processing_handle *handle,
 out:
 	if (report_handle) {
 		if (report_in_group && !dm_report_group_pop(cmd->cmd_report.report_group))
-			stack;
+			log_stack;
 		dm_report_free(report_handle);
 	}
 
@@ -1242,14 +1242,14 @@ static int _full_report_single(struct cmd_context *cmd,
 	if (orphan) {
 		if (((r = _do_report(cmd, handle, args, &args->single_args[REPORT_IDX_FULL_PVS])) != ECMD_PROCESSED) ||
 		    ((r = _do_report(cmd, handle, args, &args->single_args[REPORT_IDX_FULL_PVSEGS])) != ECMD_PROCESSED))
-			stack;
+			log_stack;
 	} else {
 		if (((r = _do_report(cmd, handle, args, &args->single_args[REPORT_IDX_FULL_VGS])) != ECMD_PROCESSED) ||
 		    ((r = _do_report(cmd, handle, args, &args->single_args[REPORT_IDX_FULL_PVS])) != ECMD_PROCESSED) ||
 		    ((r = _do_report(cmd, handle, args, &args->single_args[REPORT_IDX_FULL_LVS])) != ECMD_PROCESSED) ||
 		    ((r = _do_report(cmd, handle, args, &args->single_args[REPORT_IDX_FULL_PVSEGS])) != ECMD_PROCESSED) ||
 		    ((r = _do_report(cmd, handle, args, &args->single_args[REPORT_IDX_FULL_SEGS])) != ECMD_PROCESSED))
-			stack;
+			log_stack;
 	}
 
 	if (!args->log_only && !dm_report_group_pop(cmd->cmd_report.report_group))
@@ -1584,7 +1584,7 @@ int report_format_init(struct cmd_context *cmd)
 	return 1;
 bad:
 	if (!dm_report_group_destroy(new_report_group))
-		stack;
+		log_stack;
 	if (tmp_log_rh)
 		dm_report_free(tmp_log_rh);
 	return 0;
@@ -1593,7 +1593,7 @@ bad:
 void report_format_destroy(struct cmd_context *cmd)
 {
 	if (!dm_report_group_destroy(cmd->cmd_report.report_group))
-		stack;
+		log_stack;
 	cmd->cmd_report.report_group = NULL;
 
 	if (cmd->cmd_report.log_rh) {

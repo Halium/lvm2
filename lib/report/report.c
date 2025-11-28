@@ -4678,11 +4678,11 @@ int report_cmdlog(void *handle, const char *type, const char *context,
 
 	if (object_id &&
 	    !id_write_format(object_id, object_uuid, sizeof(object_uuid)))
-		stack;
+		log_stack;
 
 	if (object_group_id &&
 	    !id_write_format(object_group_id, object_group_uuid, sizeof(object_group_uuid)))
-		stack;
+		log_stack;
 
 	if (handle)
 		return dm_report_object(handle, &log_item);

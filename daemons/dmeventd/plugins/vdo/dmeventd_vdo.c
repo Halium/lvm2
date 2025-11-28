@@ -178,7 +178,7 @@ void process_event(struct dm_task *dmt,
 		if (_use_policy(dmt, state))
 			goto out;
 
-		stack;
+		log_stack;
 
 		if (!(new_dmt = dm_task_create(DM_DEVICE_STATUS)))
 			goto_out;

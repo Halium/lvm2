@@ -322,7 +322,7 @@ static int _create_control(const char *control, uint32_t major, uint32_t minor)
 			log_sys_error("mknod", control);
 			ret = 0;
 		} else if (_control_exists(control, major, minor) != 1) {
-			stack; /* Invalid control node created by parallel command ? */
+			log_stack; /* Invalid control node created by parallel command ? */
 			ret = 0;
 		}
 	}
@@ -578,7 +578,7 @@ static int _check_version(char *version, size_t size, int log_suppress)
 
 	r = dm_task_run(task);
 	if (!dm_task_get_driver_version(task, version, size))
-		stack;
+		log_stack;
 	dm_task_destroy(task);
 	_log_suppress = 0;
 
@@ -1485,12 +1485,12 @@ static int _process_mapper_dir(struct dm_task *dmt)
 			continue;
 		if (!dm_task_set_name(dmt, dirent->d_name)) {
 			r = 0;
-			stack;
+			log_stack;
 			continue; /* try next name */
 		}
 		if (!dm_task_run(dmt)) {
 			r = 0;
-			stack;  /* keep going */
+			log_stack;  /* keep going */
 		}
 	}
 
@@ -1613,14 +1613,14 @@ static int _create_and_load_v4(struct dm_task *dmt)
 
 	/* Next load the table */
 	if (!(task = dm_task_create(DM_DEVICE_RELOAD))) {
-		stack;
+		log_stack;
 		_udev_complete(dmt);
 		goto revert;
 	}
 
 	/* Copy across relevant fields */
 	if (dmt->dev_name && !dm_task_set_name(task, dmt->dev_name)) {
-		stack;
+		log_stack;
 		dm_task_destroy(task);
 		_udev_complete(dmt);
 		goto revert;
@@ -1641,7 +1641,7 @@ static int _create_and_load_v4(struct dm_task *dmt)
 	dm_task_destroy(task);
 
 	if (!r) {
-		stack;
+		log_stack;
 		_udev_complete(dmt);
 		goto revert;
 	}
@@ -1677,7 +1677,7 @@ static int _create_and_load_v4(struct dm_task *dmt)
 		if (!dm_task_set_cookie(dmt, &cookie,
 					(dmt->event_nr & DM_UDEV_FLAGS_MASK) >>
 					DM_UDEV_FLAGS_SHIFT))
-			stack; /* keep going */
+			log_stack; /* keep going */
 	}
 
 	if (!dm_task_run(dmt))
@@ -2093,7 +2093,7 @@ static struct dm_ioctl *_do_dm_ioctl(struct dm_task *dmt, unsigned command,
 
 	if (dmt->record_timestamp)
 		if (!dm_timestamp_get(_dm_ioctl_timestamp))
-			stack;
+			log_stack;
 
 	if (r < 0 && dmt->expected_errno != errno) {
 		dmt->ioctl_errno = errno;

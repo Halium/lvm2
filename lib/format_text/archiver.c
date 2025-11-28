@@ -326,7 +326,7 @@ struct volume_group *backup_read_vg(struct cmd_context *cmd,
 
 	dm_list_iterate_items(mda, &tf->metadata_areas_in_use) {
 		if (!(vg = mda->ops->vg_read(cmd, tf, vg_name, mda, NULL, NULL)))
-			stack;
+			log_stack;
 		break;
 	}
 
@@ -602,12 +602,12 @@ int backup_to_file(const char *file, const char *desc, struct volume_group *vg)
 	/* Write and commit the metadata area */
 	dm_list_iterate_items(mda, &tf->metadata_areas_in_use) {
 		if (!(r = mda->ops->vg_write(tf, vg, mda))) {
-			stack;
+			log_stack;
 			continue;
 		}
 		if (mda->ops->vg_commit &&
 		    !(r = mda->ops->vg_commit(tf, vg, mda))) {
-			stack;
+			log_stack;
 		}
 	}
 
@@ -658,11 +658,11 @@ void check_current_backup(struct volume_group *vg)
 
 	if (vg_backup) {
 		if (!_archive(vg_backup, 0))
-			stack;
+			log_stack;
 		release_vg(vg_backup);
 	}
 	if (!_archive(vg, 0))
-		stack;
+		log_stack;
 	if (!backup_locally(vg))
-		stack;
+		log_stack;
 }

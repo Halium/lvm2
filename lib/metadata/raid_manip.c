@@ -675,7 +675,7 @@ static int _lv_update_and_reload_list(struct logical_volume *lv, int origin_only
 			  display_lvname(lock_lv));
 		vg_revert(vg);
 	} else if (!(r = vg_commit(vg)))
-		stack; /* !vg_commit() has implicit vg_revert() */
+		log_stack; /* !vg_commit() has implicit vg_revert() */
 
 	if (r && lv_list) {
 		dm_list_iterate_items(lvl, lv_list) {
@@ -2214,7 +2214,7 @@ static int _vg_write_lv_suspend_commit_backup(struct volume_group *vg,
 			  display_lvname(lv));
 		vg_revert(lv->vg);
 	} else if (!(r = vg_commit(vg)))
-		stack; /* !vg_commit() has implicit vg_revert() */
+		log_stack; /* !vg_commit() has implicit vg_revert() */
 
 	return r;
 }
@@ -2718,7 +2718,7 @@ static int _raid_add_images_without_commit(struct logical_volume *lv,
 
 	/* Metadata LVs must be cleared before being added to the array */
 	if (!_clear_lvs(&meta_lvs)) {
-		stack;
+		log_stack;
 		goto fail;
 	}
 
@@ -3508,7 +3508,7 @@ int lv_raid_split(struct logical_volume *lv, int yes, const char *split_name,
 	}
 
 	if (!sync_local_dev_names(cmd))
-		stack;
+		log_stack;
 
 	if (vg_is_shared(split_lv->vg)) {
 		if (!lv_active_change(cmd, split_lv, CHANGE_AEY))
@@ -3607,7 +3607,7 @@ int lv_raid_split_and_track(struct logical_volume *lv,
 		return_0;
 
 	if (!sync_local_dev_names(lv->vg->cmd))
-		stack;
+		log_stack;
 
 	if (!activate_lv(lv->vg->cmd, seg_lv(seg, s)))
 		return_0;
@@ -4921,7 +4921,7 @@ static int _takeover_unsupported(TAKEOVER_FN_ARGS)
 			  (new_stripes == 1)) ? SEG_TYPE_NAME_LINEAR : new_segtype->name);
 
 	if (!_log_possible_conversion_types(lv, new_segtype))
-		stack;
+		log_stack;
 
 	return 0;
 }
@@ -4934,7 +4934,7 @@ static int _takeover_unsupported_yet(const struct logical_volume *lv, const unsi
 		   (new_stripes == 1)) ? SEG_TYPE_NAME_LINEAR : new_segtype->name);
 
 	if (!_log_possible_conversion_types(lv, new_segtype))
-		stack;
+		log_stack;
 
 	return 0;
 }
@@ -7187,11 +7187,11 @@ skip_alloc:
 					lv_iorig = seg_lv(seg_image, 0);
 
 					if (dm_snprintf(tmp_name_buf, NAME_LEN, "%s_imeta", lv_image->name) < 0) {
-						stack;
+						log_stack;
 						continue;
 					}
 					if (!(tmp_name_dup = dm_pool_strdup(lv->vg->vgmem, tmp_name_buf))) {
-						stack;
+						log_stack;
 						continue;
 					}
 
@@ -7199,11 +7199,11 @@ skip_alloc:
 						return_0;
 
 					if (dm_snprintf(tmp_name_buf, NAME_LEN, "%s_iorig", lv_image->name) < 0) {
-						stack;
+						log_stack;
 						continue;
 					}
 					if (!(tmp_name_dup = dm_pool_strdup(lv->vg->vgmem, tmp_name_buf))) {
-						stack;
+						log_stack;
 						continue;
 					}
 
@@ -7455,7 +7455,7 @@ static int _raid_count_or_clear_failed_devices(const struct logical_volume *lv,
 
 	/* Wait for meta activation. */
 	if (!sync_local_dev_names(lv->vg->cmd))
-		stack;
+		log_stack;
 
 	for (s = 0; s < raid_seg->area_count; s++) {
 		meta_lv = seg_metalv(raid_seg, s);
@@ -7494,7 +7494,7 @@ static int _raid_count_or_clear_failed_devices(const struct logical_volume *lv,
 			continue;
 
 		if (!deactivate_lv(lv->vg->cmd, seg_metalv(raid_seg, s))) {
-			stack;
+			log_stack;
 			r = 0;
 		}
 	}

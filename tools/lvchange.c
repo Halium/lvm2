@@ -407,7 +407,7 @@ static int _lvchange_resync(struct cmd_context *cmd, struct logical_volume *lv)
 
 	if (!_vg_write_commit(lv, "intermediate")) {
 		if (!_reactivate_lv(lv, active, exclusive))
-			stack;
+			log_stack;
 		return 0;
 	}
 

@@ -834,7 +834,7 @@ static int _get_parameters(struct message_data *message_data) {
 				_systemd_activation ? "systemd" : "direct",
 				_exit_on,
 				idle_buf)) < 0) {
-		stack;
+		log_stack;
 		return -ENOMEM;
 	}
 
@@ -1277,7 +1277,7 @@ static void *_monitor_thread(void *arg)
 
 		/* Before restarting event loop reset any pending SIGALRM signal */
 		if (!_reset_pending_signal(SIGALRM)) {
-			stack;
+			log_stack;
 			break; /* Something is wrong... */
 		}
 
@@ -1441,7 +1441,7 @@ static int _register_for_event(struct message_data *message_data)
 
 	if (!(dso_data = _lookup_dso(message_data)) &&
 	    !(dso_data = _load_dso(message_data))) {
-		stack;
+		log_stack;
 #ifdef ELIBACC
 		ret = ELIBACC;
 #else
@@ -1462,12 +1462,12 @@ static int _register_for_event(struct message_data *message_data)
 		/* Only creating thread during event processing
 		 * Remaining initialization happens within monitoring thread */
 		if (!(thread = _alloc_thread_status(message_data, dso_data))) {
-			stack;
+			log_stack;
 			return -ENOMEM;
 		}
 
 		if ((ret = _create_thread(thread))) {
-			stack;
+			log_stack;
 			_free_thread_status(thread);
 			return -ret;
 		}
@@ -1487,7 +1487,7 @@ static int _register_for_event(struct message_data *message_data)
 	   almost as good as dead already... */
 	if ((message_data->events_field & DM_EVENT_TIMEOUT) &&
 	    (ret = _register_for_timeout(thread))) {
-		stack;
+		log_stack;
 		_unregister_for_event(message_data);
 	}
 
@@ -1906,7 +1906,7 @@ static int _do_process_request(struct dm_event_daemon_message *msg)
 			free(answer);
 		}
 	} else if (msg->cmd != DM_EVENT_CMD_ACTIVE && !_parse_message(&message_data)) {
-		stack;
+		log_stack;
 		ret = -EINVAL;
 	} else
 		ret = _handle_request(msg, &message_data);
@@ -1941,7 +1941,7 @@ static void _process_request(struct dm_event_fifos *fifos)
 	_do_process_request(&msg);
 
 	if (!_client_write(fifos, &msg))
-		stack;
+		log_stack;
 
 	DEBUGLOG("<<< CMD:%s (0x%x) completed (result %d).", decode_cmd(cmd), cmd, msg.cmd);
 

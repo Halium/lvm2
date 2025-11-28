@@ -109,7 +109,7 @@ static int _vgrename_single(struct cmd_context *cmd, const char *vg_name,
 	dev_dir = cmd->dev_dir;
 
 	if (!lockd_rename_vg_before(cmd, vg)) {
-		stack;
+		log_stack;
 		goto error;
 	}
 
@@ -150,7 +150,7 @@ static int _vgrename_single(struct cmd_context *cmd, const char *vg_name,
 	lockd_rename_vg_final(cmd, vg, 1);
 
 	if (!backup_remove(cmd, vg_name))
-		stack;
+		log_stack;
 
 	unlock_vg(cmd, vg, vp->vg_name_new);
 	vp->unlock_new_name = 0;

@@ -180,7 +180,7 @@ static int _dev_is_md_component_native(struct device *dev, uint64_t *offset_foun
 	int ret;
 
 	if (!dev_get_size(dev, &size)) {
-		stack;
+		log_stack;
 		return -1;
 	}
 

@@ -106,7 +106,7 @@
 #define log_err_once(x...) LOG_LINE_WITH_ERRNO(_LOG_ERR | _LOG_ONCE, EUNCLASSIFIED, x)
 #define log_fatal(x...) LOG_LINE_WITH_ERRNO(_LOG_FATAL, EUNCLASSIFIED, x)
 
-#define stack log_debug("<backtrace>")	/* Backtrace on error */
+#define log_stack log_debug("<backtrace>")	/* Backtrace on error */
 #define log_very_verbose(args...) log_info(args)
 #define log_verbose(args...) log_notice(args)
 #define log_print(args...) LOG_LINE(_LOG_WARN, args)
@@ -126,13 +126,13 @@
 #define log_sys_debug(x, y) \
 		log_debug("%s: %s failed: %s", y, x, strerror(errno))
 
-#define return_0	do { stack; return 0; } while (0)
-#define return_NULL	do { stack; return NULL; } while (0)
-#define return_false	do { stack; return false; } while (0)
+#define return_0	do { log_stack; return 0; } while (0)
+#define return_NULL	do { log_stack; return NULL; } while (0)
+#define return_false	do { log_stack; return false; } while (0)
 #define return_EINVALID_CMD_LINE \
-			do { stack; return EINVALID_CMD_LINE; } while (0)
-#define return_ECMD_FAILED do { stack; return ECMD_FAILED; } while (0)
-#define goto_out	do { stack; goto out; } while (0)
-#define goto_bad	do { stack; goto bad; } while (0)
+			do { log_stack; return EINVALID_CMD_LINE; } while (0)
+#define return_ECMD_FAILED do { log_stack; return ECMD_FAILED; } while (0)
+#define goto_out	do { log_stack; goto out; } while (0)
+#define goto_bad	do { log_stack; goto bad; } while (0)
 
 #endif

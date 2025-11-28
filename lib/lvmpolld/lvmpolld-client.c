@@ -180,7 +180,7 @@ static struct progress_info _request_progress_info(const char *uuid, unsigned ab
 		ret.error = 0;
 	} else {
 		_process_error_response(rep);
-		stack;
+		log_stack;
 	}
 
 out_rep:
@@ -266,7 +266,7 @@ static int _process_poll_init(const struct cmd_context *cmd, const char *poll_ty
 		r = 1;
 	else {
 		_process_error_response(rep);
-		stack;
+		log_stack;
 	}
 
 out_rep:

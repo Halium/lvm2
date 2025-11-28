@@ -558,11 +558,11 @@ static void _lock_mem(struct cmd_context *cmd)
 		}
 
 		if (!_disable_mmap())
-			stack;
+			log_stack;
 	}
 
 	if (!_memlock_maps(cmd, LVM_MLOCK, &_mstats))
-		stack;
+		log_stack;
 }
 
 static void _unlock_mem(struct cmd_context *cmd)
@@ -579,7 +579,7 @@ static void _unlock_mem(struct cmd_context *cmd)
 	log_very_verbose("Unlocking memory");
 
 	if (!_memlock_maps(cmd, LVM_MUNLOCK, &unlock_mstats))
-		stack;
+		log_stack;
 
 	if (!_use_mlockall) {
 		_restore_mmap();

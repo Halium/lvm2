@@ -232,7 +232,7 @@ static struct volume_group *_import_vg_from_config_tree(struct cmd_context *cmd,
 		 * so it can use cached PV state too.
 		 */
 		if (!(vg = (*vsn)->read_vg(cmd, fid->fmt, fid, cft)))
-			stack;
+			log_stack;
 		else {
 			set_pv_devices(fid, vg);
 
