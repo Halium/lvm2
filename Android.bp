@@ -1,0 +1,670 @@
+// Copyright (C) 2025 UBPorts Foundation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package {
+    default_applicable_licenses: ["external_lvm2_license"],
+}
+
+license {
+    name: "external_lvm2_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-GPL-2.0",
+        "SPDX-license-identifier-LGPL-2.1",
+    ],
+    license_text: [
+        "COPYING",
+        "COPYING.LIB",
+    ],
+}
+
+cc_defaults {
+    name: "lvm2_defaults",
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-unused-function",
+        "-Wno-unused-variable",
+        "-Wno-missing-field-initializers",
+        "-Wno-sign-compare",
+        "-Wno-pointer-arith",
+        "-Wno-macro-redefined",
+        "-Wno-deprecated-declarations",
+        "-Wno-null-pointer-subtraction",
+        "-Wno-user-defined-warnings",
+        "-D_FILE_OFFSET_BITS=64",
+        "-D_GNU_SOURCE",
+        "-D__linux__",
+        // Force include configure.h and strings.h for Android
+        "-include configure.h",
+        "-include strings.h",
+    ],
+    local_include_dirs: [
+        "include",
+    ],
+    generated_headers: [
+        "lvm2_configure_h",
+    ],
+    recovery_available: true,
+}
+
+// Generate configure.h header
+genrule {
+    name: "lvm2_configure_h",
+    srcs: [
+        "include/configure.h.in",
+        "VERSION_DM",
+    ],
+    out: ["configure.h"],
+    cmd: "DM_VERSION=$$(cat $(location VERSION_DM) | head -n1 | sed 's/ .*//' | sed 's/-.*//'); " +
+        "sed " +
+        "-e 's|@DEFAULT_SYS_DIR@|\"/etc/lvm\"|g' " +
+        "-e 's|@DEFAULT_PROFILE_DIR@|\"/etc/lvm/profile\"|g' " +
+        "-e 's|@DEFAULT_ARCHIVE_SUBDIR@|\"archive\"|g' " +
+        "-e 's|@DEFAULT_BACKUP_SUBDIR@|\"backup\"|g' " +
+        "-e 's|@DEFAULT_CACHE_SUBDIR@|\"cache\"|g' " +
+        "-e 's|@DEFAULT_LOCK_DIR@|\"/run/lock/lvm\"|g' " +
+        "-e 's|@DEFAULT_RUN_DIR@|\"/run/lvm\"|g' " +
+        "-e 's|#undef DEFAULT_RUN_DIR|#define DEFAULT_RUN_DIR \"/run/lvm\"|g' " +
+        "-e 's|#undef DEFAULT_SYS_DIR|#define DEFAULT_SYS_DIR \"/etc/lvm\"|g' " +
+        "-e 's|#undef LVMPERSIST_PATH|#define LVMPERSIST_PATH \"/system/bin/lvmpersist\"|g' " +
+        "-e 's|#undef LVM_PATH|#define LVM_PATH \"/system/bin/lvm\"|g' " +
+        "-e 's|#undef LVM_CONFIGURE_LINE|#define LVM_CONFIGURE_LINE \"Android\"|g' " +
+        "-e 's|#undef MODULES_PATH|#define MODULES_PATH \"/system/lib/modules\"|g' " +
+        "-e 's|@DEFAULT_DM_RUN_DIR@|\"/run\"|g' " +
+        "-e 's|@DEFAULT_PID_DIR@|\"/run\"|g' " +
+        "-e 's|@DEFAULT_PROC_DIR@|\"/proc\"|g' " +
+        "-e 's|#undef DEFAULT_PROC_DIR|#define DEFAULT_PROC_DIR \"/proc\"|g' " +
+        "-e 's|@DEFAULT_ETC_DIR@|\"/etc\"|g' " +
+        "-e 's|#undef DEFAULT_ETC_DIR|#define DEFAULT_ETC_DIR \"/etc\"|g' " +
+        "-e 's|#undef DEFAULT_LOCK_DIR|#define DEFAULT_LOCK_DIR \"/run/lock/lvm\"|g' " +
+        "-e 's|#undef DEFAULT_CACHE_SUBDIR|#define DEFAULT_CACHE_SUBDIR \"cache\"|g' " +
+        "-e 's|#undef DEFAULT_USE_BLKID_WIPING|#define DEFAULT_USE_BLKID_WIPING 0|g' " +
+        "-e 's|#undef DEFAULT_USE_LVMPOLLD|#define DEFAULT_USE_LVMPOLLD 0|g' " +
+        "-e 's|#undef DEFAULT_ARCHIVE_SUBDIR|#define DEFAULT_ARCHIVE_SUBDIR \"archive\"|g' " +
+        "-e 's|#undef DEFAULT_BACKUP_SUBDIR|#define DEFAULT_BACKUP_SUBDIR \"backup\"|g' " +
+        "-e 's|#undef DEFAULT_PROFILE_SUBDIR|#define DEFAULT_PROFILE_SUBDIR \"/etc/lvm/profile\"|g' " +
+        "-e 's|#undef FSADM_PATH|#define FSADM_PATH \"/system/bin/fsadm\"|g' " +
+        "-e 's|#undef LVRESIZE_FS_HELPER_PATH|#define LVRESIZE_FS_HELPER_PATH \"/system/bin/lvresize_fs_helper\"|g' " +
+        "-e 's|#undef CACHE_CHECK_CMD|#define CACHE_CHECK_CMD \"\"|g' " +
+        "-e 's|#undef CACHE_DUMP_CMD|#define CACHE_DUMP_CMD \"\"|g' " +
+        "-e 's|#undef CACHE_REPAIR_CMD|#define CACHE_REPAIR_CMD \"\"|g' " +
+        "-e 's|#undef CACHE_RESTORE_CMD|#define CACHE_RESTORE_CMD \"\"|g' " +
+        "-e 's|#undef THIN_CHECK_CMD|#define THIN_CHECK_CMD \"\"|g' " +
+        "-e 's|#undef THIN_DUMP_CMD|#define THIN_DUMP_CMD \"\"|g' " +
+        "-e 's|#undef THIN_REPAIR_CMD|#define THIN_REPAIR_CMD \"\"|g' " +
+        "-e 's|#undef THIN_RESTORE_CMD|#define THIN_RESTORE_CMD \"\"|g' " +
+        "-e 's|#undef VDO_FORMAT_CMD|#define VDO_FORMAT_CMD \"\"|g' " +
+        "-e 's|#undef DEVMAPPER_SUPPORT|#define DEVMAPPER_SUPPORT 1|g' " +
+        "-e 's|#undef DEVMAPPER|#define DEVMAPPER 1|g' " +
+        "-e 's|#undef HAVE_SELINUX|#define HAVE_SELINUX 1|g' " +
+        "-e 's|#undef HAVE_REALLOCARRAY|#define HAVE_REALLOCARRAY 1|g' " +
+        "-e 's|#undef HAVE_MALLOC_H|#define HAVE_MALLOC_H 1|g' " +
+        "-e 's|#undef HAVE_STDINT_H|#define HAVE_STDINT_H 1|g' " +
+        "-e 's|#undef HAVE_INTTYPES_H|#define HAVE_INTTYPES_H 1|g' " +
+        "-e 's|#undef HAVE_SYS_STAT_H|#define HAVE_SYS_STAT_H 1|g' " +
+        "-e 's|#undef HAVE_STRING_H|#define HAVE_STRING_H 1|g' " +
+        "-e 's|#undef HAVE_STRINGS_H|#define HAVE_STRINGS_H 1|g' " +
+        "-e 's|#undef HAVE_UNISTD_H|#define HAVE_UNISTD_H 1|g' " +
+        "-e 's|#undef HAVE_PTHREAD_H|#define HAVE_PTHREAD_H 1|g' " +
+        "-e 's|#undef HAVE_FFS|#define HAVE_FFS 1|g' " +
+        "-e 's|#undef HAVE_IOCTL|#define HAVE_IOCTL 1|g' " +
+        "-e 's|#undef HAVE_SYS_IOCTL_H|#define HAVE_SYS_IOCTL_H 1|g' " +
+        "-e 's|#undef HAVE_TERMIOS_H|#define HAVE_TERMIOS_H 1|g' " +
+        "-e 's|#undef DEFAULT_USE_DEVICES_FILE|#define DEFAULT_USE_DEVICES_FILE 0|g' " +
+        "-e 's|#undef DEFAULT_EVENT_ACTIVATION|#define DEFAULT_EVENT_ACTIVATION 0|g' " +
+        "-e 's|#undef DEFAULT_SI_UNIT_CONSISTENCY|#define DEFAULT_SI_UNIT_CONSISTENCY 1|g' " +
+        "-e 's|#undef DEFAULT_MIRROR_SEGTYPE|#define DEFAULT_MIRROR_SEGTYPE \"raid1\"|g' " +
+        "-e 's|#undef DEFAULT_DM_ADD_NODE|#define DEFAULT_DM_ADD_NODE DM_ADD_NODE_ON_CREATE|g' " +
+        "-e 's|#undef DEFAULT_DM_NAME_MANGLING|#define DEFAULT_DM_NAME_MANGLING DM_STRING_MANGLING_AUTO|g' " +
+        "-e 's|#undef DM_DEVICE_UID|#define DM_DEVICE_UID 0|g' " +
+        "-e 's|#undef DM_DEVICE_GID|#define DM_DEVICE_GID 0|g' " +
+        "-e 's|#undef DM_DEVICE_MODE|#define DM_DEVICE_MODE 0600|g' " +
+        "-e 's|#undef DEFAULT_RAID10_SEGTYPE|#define DEFAULT_RAID10_SEGTYPE \"raid10\"|g' " +
+        "-e 's|#undef DEFAULT_SPARSE_SEGTYPE|#define DEFAULT_SPARSE_SEGTYPE \"thin\"|g' " +
+        "-e 's|#undef LVM1_INTERNAL|/* #undef LVM1_INTERNAL */|g' " +
+        "-e 's|#undef POOL_INTERNAL|/* #undef POOL_INTERNAL */|g' " +
+        "-e 's|#undef SNAPSHOT_INTERNAL|#define SNAPSHOT_INTERNAL 1|g' " +
+        "-e 's|#undef RAID_INTERNAL|#define RAID_INTERNAL 1|g' " +
+        "-e 's|#undef THIN_INTERNAL|#define THIN_INTERNAL 1|g' " +
+        "-e 's|#undef CACHE_INTERNAL|#define CACHE_INTERNAL 1|g' " +
+        "-e 's|#undef WRITECACHE_INTERNAL|#define WRITECACHE_INTERNAL 1|g' " +
+        "-e 's|#undef INTEGRITY_INTERNAL|#define INTEGRITY_INTERNAL 1|g' " +
+        "-e 's|#undef VDO_INTERNAL|/* #undef VDO_INTERNAL */|g' " +
+        "-e \"s|#undef DM_LIB_VERSION|#define DM_LIB_VERSION \\\"$$DM_VERSION\\\"|g\" " +
+        "$(location include/configure.h.in) > $(out)",
+}
+
+// Generate lvm-version.h header
+genrule {
+    name: "lvm2_version_h",
+    srcs: [
+        "include/lvm-version.h.in",
+        "VERSION",
+        "VERSION_DM",
+    ],
+    out: ["lvm-version.h"],
+    cmd: "VERSION=$$(cat $(location VERSION) | head -n1); " +
+        "DM_VERSION=$$(cat $(location VERSION_DM) | head -n1 | sed 's/ .*//' | sed 's/-.*//'); " +
+        "MAJOR=$$(echo $$VERSION | sed 's/\\([0-9]*\\)\\..*/\\1/'); " +
+        "MINOR=$$(echo $$VERSION | sed 's/[0-9]*\\.\\([0-9]*\\)\\..*/\\1/'); " +
+        "PATCH=$$(echo $$VERSION | sed 's/[0-9]*\\.[0-9]*\\.\\([0-9]*\\).*/\\1/'); " +
+        "RELEASE=$$(echo $$VERSION | sed 's/.*-\\(.*\\) .*/\\1/'); " +
+        "DATE=$$(echo $$VERSION | sed 's/.*(\\(.*\\))/\\1/'); " +
+        "sed " +
+        "-e \"s|@LVM_VERSION@|\\\"$$VERSION\\\"|g\" " +
+        "-e \"s|@LVM_MAJOR@|$$MAJOR|g\" " +
+        "-e \"s|@LVM_MINOR@|$$MINOR|g\" " +
+        "-e \"s|@LVM_PATCHLEVEL@|$$PATCH|g\" " +
+        "-e \"s|@LVM_LIBAPI@|$$MAJOR.$$MINOR|g\" " +
+        "-e \"s|@LVM_RELEASE@|\\\"$$RELEASE\\\"|g\" " +
+        "-e \"s|@LVM_RELEASE_DATE@|\\\"$$DATE\\\"|g\" " +
+        "$(location include/lvm-version.h.in) > $(out); " +
+        "echo \"#define DM_LIB_VERSION \\\"$$DM_VERSION\\\"\" >> $(out)",
+}
+
+// liblvm2-base - base data structures library for LVM2
+cc_library_static {
+    name: "liblvm2-base",
+    defaults: ["lvm2_defaults"],
+
+    srcs: [
+        "base/data-struct/hash.c",
+        "base/data-struct/list.c",
+        "base/data-struct/radix-tree.c",
+    ],
+
+    local_include_dirs: [
+        "base/data-struct",
+    ],
+
+    export_include_dirs: [
+        "base/data-struct",
+    ],
+
+    generated_headers: [
+        "lvm2_configure_h",
+    ],
+}
+
+// libdaemonclient - daemon client library
+cc_library_static {
+    name: "libdaemonclient",
+    defaults: ["lvm2_defaults"],
+
+    srcs: [
+        "libdaemon/client/daemon-io.c",
+        "libdaemon/client/config-util.c",
+        "libdaemon/client/daemon-client.c",
+    ],
+
+    local_include_dirs: [
+        "libdaemon/client",
+    ],
+
+    export_include_dirs: [
+        "libdaemon/client",
+    ],
+
+    generated_headers: [
+        "lvm2_configure_h",
+    ],
+
+    static_libs: [
+        "liblvm2-base",
+    ],
+}
+
+// libdevice-mapper - internal device-mapper library (used by LVM2 tools)
+// Note: This is NOT the public libdevmapper API library from libdm/
+cc_library_static {
+    name: "libdevice-mapper",
+    defaults: ["lvm2_defaults"],
+
+    srcs: [
+        "device_mapper/datastruct/bitset.c",
+        "device_mapper/ioctl/libdm-iface.c",
+        "device_mapper/libdm-common.c",
+        "device_mapper/libdm-config.c",
+        "device_mapper/libdm-deptree.c",
+        "device_mapper/libdm-file.c",
+        "device_mapper/libdm-report.c",
+        "device_mapper/libdm-string.c",
+        "device_mapper/libdm-targets.c",
+        "device_mapper/libdm-timestamp.c",
+        "device_mapper/mm/pool.c",
+        "device_mapper/raid/raid_parser.c",
+        "device_mapper/regex/matcher.c",
+        "device_mapper/regex/parse_rx.c",
+        "device_mapper/regex/ttree.c",
+        "device_mapper/vdo/status.c",
+        "device_mapper/vdo/vdo_reader.c",
+        "device_mapper/vdo/vdo_target.c",
+    ],
+
+    local_include_dirs: [
+        "base/data-struct",
+        "device_mapper",
+        "device_mapper/ioctl",
+        "device_mapper/misc",
+    ],
+
+    export_include_dirs: [
+        "device_mapper",
+    ],
+
+    generated_headers: [
+        "lvm2_configure_h",
+        "lvm2_version_h",
+    ],
+
+    static_libs: [
+        "liblvm2-base",
+    ],
+
+    shared_libs: [
+        "libselinux",
+    ],
+
+    cflags: [
+        "-DDEVICE_MAPPER=1",
+        "-DDM_IOCTLS=1",
+    ],
+}
+
+// libdevmapper - public device-mapper API backing dmsetup
+cc_library_static {
+    name: "libdevmapper",
+    defaults: ["lvm2_defaults"],
+
+    srcs: [
+        "libdm/datastruct/bitset.c",
+        "libdm/datastruct/hash.c",
+        "libdm/datastruct/list.c",
+        "libdm/ioctl/libdm-iface.c",
+        "libdm/libdm-common.c",
+        "libdm/libdm-config.c",
+        "libdm/libdm-deptree.c",
+        "libdm/libdm-file.c",
+        "libdm/libdm-report.c",
+        "libdm/libdm-stats.c",
+        "libdm/libdm-string.c",
+        "libdm/libdm-targets.c",
+        "libdm/libdm-timestamp.c",
+        "libdm/mm/dbg_malloc.c",
+        "libdm/mm/pool.c",
+        "libdm/regex/matcher.c",
+        "libdm/regex/parse_rx.c",
+        "libdm/regex/ttree.c",
+    ],
+
+    local_include_dirs: [
+        ".",
+        "libdm",
+        "libdm/datastruct",
+        "libdm/dm-tools",
+        "libdm/ioctl",
+        "libdm/mm",
+        "libdm/regex",
+    ],
+
+    export_include_dirs: ["."],
+
+    generated_headers: [
+        "lvm2_configure_h",
+        "lvm2_version_h",
+    ],
+
+    shared_libs: [
+        "libselinux",
+    ],
+}
+
+// liblvm-internal - core LVM library
+cc_library_static {
+    name: "liblvm-internal",
+    defaults: ["lvm2_defaults"],
+
+    srcs: [
+        "lib/activate/activate.c",
+        "lib/activate/dev_manager.c",
+        "lib/activate/fs.c",
+        "lib/cache/lvmcache.c",
+        "lib/writecache/writecache.c",
+        "lib/integrity/integrity.c",
+        "lib/cache_segtype/cache.c",
+        "lib/commands/toolcontext.c",
+        "lib/config/config.c",
+        "lib/datastruct/btree.c",
+        "lib/datastruct/str_list.c",
+        "lib/device/bcache.c",
+        "lib/device/bcache-utils.c",
+        "lib/device/dev-cache.c",
+        "lib/device/device_id.c",
+        "lib/device/dev-ext.c",
+        "lib/device/dev-io.c",
+        "lib/device/dev-md.c",
+        "lib/device/dev-mpath.c",
+        "lib/device/dev-swap.c",
+        "lib/device/dev-type.c",
+        "lib/device/dev-luks.c",
+        "lib/device/dev-dasd.c",
+        "lib/device/dev-lvm1-pool.c",
+        "lib/device/filesystem.c",
+        "lib/device/online.c",
+        "lib/device/parse_vpd.c",
+        "lib/device/persist.c",
+        "lib/device/nvme.c",
+        "lib/device/dev_util.c",
+        "lib/display/display.c",
+        "lib/error/errseg.c",
+        "lib/unknown/unknown.c",
+        "lib/filters/filter-composite.c",
+        "lib/filters/filter-persistent.c",
+        "lib/filters/filter-regex.c",
+        "lib/filters/filter-sysfs.c",
+        "lib/filters/filter-md.c",
+        "lib/filters/filter-fwraid.c",
+        "lib/filters/filter-mpath.c",
+        "lib/filters/filter-partitioned.c",
+        "lib/filters/filter-type.c",
+        "lib/filters/filter-usable.c",
+        "lib/filters/filter-signature.c",
+        "lib/filters/filter-deviceid.c",
+        "lib/format_text/archive.c",
+        "lib/format_text/archiver.c",
+        "lib/format_text/export.c",
+        "lib/format_text/flags.c",
+        "lib/format_text/format-text.c",
+        "lib/format_text/import.c",
+        "lib/format_text/import_vsn1.c",
+        "lib/format_text/text_label.c",
+        "lib/freeseg/freeseg.c",
+        "lib/label/label.c",
+        "lib/label/hints.c",
+        "lib/locking/file_locking.c",
+        "lib/locking/locking.c",
+        "lib/log/log.c",
+        "lib/metadata/cache_manip.c",
+        "lib/metadata/writecache_manip.c",
+        "lib/metadata/integrity_manip.c",
+        "lib/metadata/lv.c",
+        "lib/metadata/lv_manip.c",
+        "lib/metadata/merge.c",
+        "lib/metadata/metadata.c",
+        "lib/metadata/mirror.c",
+        "lib/metadata/pool_manip.c",
+        "lib/metadata/pv.c",
+        "lib/metadata/pv_list.c",
+        "lib/metadata/pv_manip.c",
+        "lib/metadata/pv_map.c",
+        "lib/metadata/raid_manip.c",
+        "lib/metadata/segtype.c",
+        "lib/metadata/snapshot_manip.c",
+        "lib/metadata/thin_manip.c",
+        "lib/metadata/vdo_manip.c",
+        "lib/metadata/vg.c",
+        "lib/mirror/mirrored.c",
+        "lib/misc/crc.c",
+        "lib/misc/lvm-exec.c",
+        "lib/misc/lvm-file.c",
+        "lib/misc/lvm-flock.c",
+        "lib/misc/lvm-globals.c",
+        "lib/misc/lvm-maths.c",
+        "lib/misc/lvm-signal.c",
+        "lib/misc/lvm-string.c",
+        "lib/misc/lvm-wrappers.c",
+        "lib/misc/lvm-percent.c",
+        "lib/misc/sharedlib.c",
+        "lib/mm/memlock.c",
+        "lib/notify/lvmnotify.c",
+        "lib/properties/prop_common.c",
+        "lib/raid/raid.c",
+        "lib/report/properties.c",
+        "lib/report/report.c",
+        "lib/snapshot/snapshot.c",
+        "lib/striped/striped.c",
+        "lib/thin/thin.c",
+        "lib/uuid/uuid.c",
+        "lib/zero/zero.c",
+    ],
+
+    local_include_dirs: [
+        "lib",
+    ],
+
+    export_include_dirs: [
+        "lib",
+    ],
+
+    generated_headers: [
+        "lvm2_configure_h",
+        "lvm2_version_h",
+        "lvm2_cmds_h",
+    ],
+
+    static_libs: [
+        "libdaemonclient",
+        "libdevice-mapper",
+        "liblvm2-base",
+    ],
+
+    shared_libs: [
+        "libselinux",
+    ],
+
+    target: {
+        recovery: {
+            exclude_shared_libs: [
+                "libselinux",
+            ],
+            static_libs: [
+                "libselinux",
+            ],
+        },
+    },
+}
+
+// Command-line generated headers for lvm tools
+genrule {
+    name: "lvm2_cmds_h",
+    srcs: ["tools/command-lines.in"],
+    out: ["cmds.h"],
+    cmd: "echo '/* Auto-generated */' > $(out); " +
+        "grep '^ID:' $(in) | sed 's/ID: *//' | sort -u | awk '{printf \"cmd(%s_CMD, %s)\\n\", $$1, $$1}' >> $(out); " +
+        "echo 'cmd(CMD_NONE, none)' >> $(out); " +
+        "echo 'cmd(CMD_COUNT, count)' >> $(out)",
+}
+
+genrule {
+    name: "lvm2_command_count_h",
+    srcs: ["tools/command-lines.in"],
+    out: ["command-count.h"],
+    cmd: "printf '/* Auto-generated */\\n#define COMMAND_COUNT ' > $(out); " +
+        "grep -c '^ID:' $(in) >> $(out)",
+}
+
+genrule {
+    name: "lvm2_command_lines_input_h",
+    srcs: ["tools/command-lines.in"],
+    out: ["command-lines-input.h"],
+    cmd: "printf '/* Auto-generated */\\nstatic const char _command_input[] =\\n\\n\"' > $(out); " +
+        "awk 'BEGIN {ORS = \"\\\\0\\\"\\n\\\"\"} !/^#/ && !/---/ && !/^$$/' $(in) >> $(out); " +
+        "printf '\\\\0\\\\0\";\\n' >> $(out)",
+}
+
+// lvm - main LVM command-line tool
+cc_binary {
+    name: "lvm",
+    defaults: ["lvm2_defaults"],
+    recovery: true,
+
+    srcs: [
+        "tools/command.c",
+        "tools/dumpconfig.c",
+        "tools/formats.c",
+        "tools/lvchange.c",
+        "tools/lvconvert.c",
+        "tools/lvconvert_poll.c",
+        "tools/lvcreate.c",
+        "tools/lvdisplay.c",
+        "tools/lvextend.c",
+        "tools/lvmcmdline.c",
+        "tools/lvmdevices.c",
+        "tools/lvmdiskscan.c",
+        "tools/lvpoll.c",
+        "tools/lvreduce.c",
+        "tools/lvremove.c",
+        "tools/lvrename.c",
+        "tools/lvresize.c",
+        "tools/lvscan.c",
+        "tools/polldaemon.c",
+        "tools/pvchange.c",
+        "tools/pvck.c",
+        "tools/pvcreate.c",
+        "tools/pvdisplay.c",
+        "tools/pvmove.c",
+        "tools/pvmove_poll.c",
+        "tools/pvremove.c",
+        "tools/pvresize.c",
+        "tools/pvscan.c",
+        "tools/reporter.c",
+        "tools/segtypes.c",
+        "tools/tags.c",
+        "tools/toollib.c",
+        "tools/vgcfgbackup.c",
+        "tools/vgcfgrestore.c",
+        "tools/vgchange.c",
+        "tools/vgck.c",
+        "tools/vgcreate.c",
+        "tools/vgdisplay.c",
+        "tools/vgexport.c",
+        "tools/vgextend.c",
+        "tools/vgimport.c",
+        "tools/vgimportclone.c",
+        "tools/vgimportdevices.c",
+        "tools/vgmerge.c",
+        "tools/vgmknodes.c",
+        "tools/vgreduce.c",
+        "tools/vgremove.c",
+        "tools/vgrename.c",
+        "tools/vgscan.c",
+        "tools/vgsplit.c",
+        "tools/lvm.c",
+    ],
+
+    local_include_dirs: [
+        "tools",
+    ],
+
+    generated_headers: [
+        "lvm2_configure_h",
+        "lvm2_version_h",
+        "lvm2_cmds_h",
+        "lvm2_command_count_h",
+        "lvm2_command_lines_input_h",
+    ],
+
+    static_libs: [
+        "liblvm-internal",
+        "libdaemonclient",
+        "libdevice-mapper",
+        "liblvm2-base",
+        "libselinux",
+    ],
+
+    symlinks: [
+        "lvchange",
+        "lvconvert",
+        "lvcreate",
+        "lvdisplay",
+        "lvextend",
+        "lvmconfig",
+        "lvmdevices",
+        "lvmdiskscan",
+        "lvmsadc",
+        "lvmsar",
+        "lvreduce",
+        "lvremove",
+        "lvrename",
+        "lvresize",
+        "lvs",
+        "lvscan",
+        "pvchange",
+        "pvck",
+        "pvcreate",
+        "pvdisplay",
+        "pvmove",
+        "pvremove",
+        "pvresize",
+        "pvs",
+        "pvscan",
+        "vgcfgbackup",
+        "vgcfgrestore",
+        "vgchange",
+        "vgck",
+        "vgcreate",
+        "vgdisplay",
+        "vgexport",
+        "vgextend",
+        "vgimport",
+        "vgimportclone",
+        "vgimportdevices",
+        "vgmerge",
+        "vgmknodes",
+        "vgreduce",
+        "vgremove",
+        "vgrename",
+        "vgs",
+        "vgscan",
+        "vgsplit",
+    ],
+
+    target: {
+        recovery: {
+            exclude_shared_libs: [
+                "libselinux",
+            ],
+            static_libs: [
+                "libselinux",
+            ],
+        },
+    },
+}
+
+// dmsetup - device-mapper setup tool
+cc_binary {
+    name: "dmsetup",
+    defaults: ["lvm2_defaults"],
+    recovery: true,
+
+    srcs: [
+        "libdm/dm-tools/dmsetup.c",
+    ],
+
+    local_include_dirs: [
+        "libdm/dm-tools",
+    ],
+
+    generated_headers: [
+        "lvm2_configure_h",
+        "lvm2_version_h",
+    ],
+
+    static_libs: [
+        "libdevmapper",
+        "libselinux",
+    ],
+}
