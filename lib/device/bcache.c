@@ -26,7 +26,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#ifdef HAVE_LIBAIO_H
 #include <libaio.h>
+#endif
 #include <unistd.h>
 #include <linux/fs.h>
 #include <sys/user.h>
@@ -56,6 +58,13 @@ static inline struct dm_list *_list_pop(struct dm_list *head)
 }
 
 //----------------------------------------------------------------
+
+// Shared variables used by both async and sync engines
+static int _last_byte_di;
+static uint64_t _last_byte_offset;
+static int _last_byte_sector_size;
+
+#ifdef HAVE_LIBAIO_H
 
 struct control_block {
 	struct dm_list list;
@@ -159,10 +168,6 @@ static void _async_destroy(struct io_engine *ioe)
 
 	free(e);
 }
-
-static int _last_byte_di;
-static uint64_t _last_byte_offset;
-static int _last_byte_sector_size;
 
 static bool _async_issue(struct io_engine *ioe, enum dir d, int di,
 			 sector_t sb, sector_t se, void *data, void *context)
@@ -403,6 +408,18 @@ struct io_engine *create_async_io_engine(void)
 	/* coverity[leaked_storage] 'e' is not leaking */
 	return &e->e;
 }
+#else
+/* Stub implementation - return sync engine instead */
+struct io_engine *create_async_io_engine(void)
+{
+	static int warned = 0;
+	if (!warned) {
+		log_warn("libaio not available, using synchronous I/O");
+		warned = 1;
+	}
+	return create_sync_io_engine();
+}
+#endif
 
 //----------------------------------------------------------------
 
