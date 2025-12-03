@@ -12,23 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package {
-    default_applicable_licenses: ["external_lvm2_license"],
-}
-
-license {
-    name: "external_lvm2_license",
-    visibility: [":__subpackages__"],
-    license_kinds: [
-        "SPDX-license-identifier-GPL-2.0",
-        "SPDX-license-identifier-LGPL-2.1",
-    ],
-    license_text: [
-        "COPYING",
-        "COPYING.LIB",
-    ],
-}
-
 cc_defaults {
     name: "lvm2_defaults",
     cflags: [
@@ -42,7 +25,7 @@ cc_defaults {
         "-Wno-pointer-arith",
         "-Wno-macro-redefined",
         "-Wno-deprecated-declarations",
-        "-Wno-null-pointer-subtraction",
+        "-Wno-null-pointer-arithmetic",
         "-Wno-user-defined-warnings",
         "-D_FILE_OFFSET_BITS=64",
         "-D_GNU_SOURCE",
@@ -464,17 +447,6 @@ cc_library_static {
     shared_libs: [
         "libselinux",
     ],
-
-    target: {
-        recovery: {
-            exclude_shared_libs: [
-                "libselinux",
-            ],
-            static_libs: [
-                "libselinux",
-            ],
-        },
-    },
 }
 
 // Command-line generated headers for lvm tools
@@ -631,17 +603,6 @@ cc_binary {
         "vgscan",
         "vgsplit",
     ],
-
-    target: {
-        recovery: {
-            exclude_shared_libs: [
-                "libselinux",
-            ],
-            static_libs: [
-                "libselinux",
-            ],
-        },
-    },
 }
 
 // dmsetup - device-mapper setup tool
