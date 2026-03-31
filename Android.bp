@@ -455,8 +455,8 @@ genrule {
     srcs: ["tools/command-lines.in"],
     out: ["cmds.h"],
     cmd: "echo '/* Auto-generated */' > $(out); " +
-        "grep '^ID:' $(in) | sed 's/ID: *//' | sort -u | awk '{printf \"cmd(%s_CMD, %s)\\n\", $$1, $$1}' >> $(out); " +
         "echo 'cmd(CMD_NONE, none)' >> $(out); " +
+        "grep '^ID:' $(in) | sed 's/ID: *//' | sort -u | awk '{printf \"cmd(%s_CMD, %s)\\n\", $$1, $$1}' >> $(out); " +
         "echo 'cmd(CMD_COUNT, count)' >> $(out)",
 }
 
