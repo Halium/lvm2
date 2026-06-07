@@ -90,6 +90,7 @@ genrule {
         "-e 's|#undef THIN_REPAIR_CMD|#define THIN_REPAIR_CMD \"\"|g' " +
         "-e 's|#undef THIN_RESTORE_CMD|#define THIN_RESTORE_CMD \"\"|g' " +
         "-e 's|#undef VDO_FORMAT_CMD|#define VDO_FORMAT_CMD \"\"|g' " +
+        "-e 's|#undef DM_IOCTLS|#define DM_IOCTLS 1|g' " +
         "-e 's|#undef DEVMAPPER_SUPPORT|#define DEVMAPPER_SUPPORT 1|g' " +
         "-e 's|#undef DEVMAPPER|#define DEVMAPPER 1|g' " +
         "-e 's|#undef HAVE_SELINUX|#define HAVE_SELINUX 1|g' " +

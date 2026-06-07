@@ -461,9 +461,12 @@ static int _open_control(void)
 	/*
 	 * As of 2.6.36 kernels, the open can trigger autoloading dm-mod.
 	 */
-	if (!_open_and_assign_control_fd(control))
-		goto_bad;
-	
+	if (!_open_and_assign_control_fd(control)) {
+		/* Fall back to /dev/device-mapper if /dev/mapper/control is unavailable. */
+		if ((_control_fd = open("/dev/device-mapper", O_RDWR)) < 0)
+			goto_bad;
+	}
+
 	if (!_create_dm_bitset(1)) {
 		log_error("Failed to set up list of device-mapper major numbers");
 		return 0;
